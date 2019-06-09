@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block script %}
+    <script>
+        $(function () {
+            var $q = $("#q");
+            var $keywork_search = $("#kwyword_search");
+            var $heart = $(".heart");
+
+            $heart.click(function(){
+                // 点击收藏切换图标颜色
+                var $heart_n_span = $(this).parent().next()
+                var heart_count = parseInt($heart_n_span.text());
+                if ($(this).css("color") == "rgb(232, 94, 146)"){
+                    $heart_n_span.html(heart_count - 1);
+                    $(this).css("color", "rgb(128, 128, 128)");
+                } else {
+                    $heart_n_span.html(heart_count + 1);
+                    $(this).css("color", "rgb(232, 94, 146)");
+                }
+            });
+
+            $keywork_search.click(function () {
+                window.location.href = "http://baidu.com/s" + "?wd=" + $q.val();
+                return false
+            });
+
+
+        })
+    </script>
+{% endblock %}
+
+{% block style %}
+    <style>
+        [class*="col-"] {
+            padding: 8px;
+        }
+        .heart {
+            font-size: 16px;
+            color: gray;
+        }
+        .reply {
+            font-size: 16px;
+            color: green;
+        }
+        .heart_span {
+            font-size: 16px;
+        }
+
+    </style>
+{% endblock %}
+
+{% block title %}share life index{% endblock %}
+
+{% block body %}
+    <div class="container-fluid" style="padding-left:23px;padding-right:23px;background-color:#f0f2f1;padding-top:10px;">
+
+        <div class="row">
+            <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                <div class="thumbnail">
+                    <a href="http://baidu.com"><img src="{% static 'base/bg_groups/school_flower.jpg' %}" alt="..."></a>
+                    <div class="caption">
+                        <a href="http://baidu.com/s?wd=穷怎么办" class="text-danger" style="font-size:16px;">校花图</a>
+                        <p class="text-muted" style="margin-top:5px;margin-bottom:5px;">15 分钟之前</p>
+                        <p>这是我最近的照片，作为一个地球人我认为保护冥王星不受太阳辐射带来的危害使我们的责任和义务。</p>
+                    </div>
+                    <div style="background-color:#e2e6e4;margin-left:-4px;margin-right:-4px;margin-bottom:-4px;text-indent:6px;line-height:34px;">
+                        <a href="#"><span title="点击收藏" class="glyphicon glyphicon-heart heart initialism" aria-hidden="true"></a>
+                        <span class="heart_span">1301</span>
+                        <a href="#"> <span class="glyphicon glyphicon-comment reply" aria-hidden="true"></a>
+                        <span class="heart_span">57</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+{% endblock %}

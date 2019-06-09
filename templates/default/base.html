@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+    {% block script %}{% endblock %}
+    <script>
+        $(function () {
+            var $q = $("#q");
+            var $keywork_search = $("#kwyword_search");
+
+            $keywork_search.click(function () {
+                window.location.href = "http://baidu.com/s" + "?wd=" + $q.val();
+                return false
+            });
+        })
+    </script>
+    {% block style %}{% endblock %}
+    <title>{% block title %}share life index{% endblock %}</title>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-default" style="margin-bottom:0px;">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{% url 'picture:index' %}">Lemonk</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+                <form class="navbar-form navbar-left">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="关键字" id="q">
+                    </div>
+                    <button type="submit" class="btn btn-default" id="kwyword_search" style="outline:none"><span
+                            class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                </form>
+                <ul class="nav navbar-nav">
+                    <li><a href="#"><span class="glyphicon glyphicon-home" aria-hidden="true"></span><span
+                                style="font-size: 16px"> 探索</span></a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                            aria-expanded="false"><span class="glyphicon glyphicon-menu-hamburger"
+                                aria-hidden="true"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">回复</a></li>
+                            <li><a href="#">关注</a></li>
+                            <li><a href="#">聊天</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">个人中心</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+
+    {% block body %} {% endblock %}
+
+
+    <div style="text-align:center;padding-top:20px;">
+        <p>Copyright 2019 by Owner(wcp) - 备案信息 - <a href="/">手机版</a> - <a href="mailto:smartwu_sir@163.com">联系我</a></p>
+    </div>
+</body>
+
+</html>
