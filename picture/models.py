@@ -22,7 +22,7 @@ class Album(models.Model):
     title = models.CharField(max_length=16, verbose_name="相册标题", default="")
     desc = models.CharField(max_length=64, verbose_name="相册描述", default="")
     category = models.IntegerField(verbose_name="种类", default=0)
-    tags = models.ManyToManyField('AlbumTag', verbose_name="标签", null=True)
+    tags = models.ManyToManyField('AlbumTag', verbose_name="标签", blank=True)
     first_picture_id = models.IntegerField(verbose_name="第一张图片 id", default=0)
     update_time = models.DateTimeField(auto_now=True, verbose_name="更新时间")
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
