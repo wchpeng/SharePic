@@ -39,7 +39,7 @@ def get_favorite_album_count(album_id):
 
 def update_favorite_album_count(album_id):
     # 保存相册收藏数
-    update_count(key="album_id", value=album_id, obj=FavoriteAlbum, cache_key_format=FAVORITE_ALBUM_CACHE_KEY)
+    update_count.delay(key="album_id", value=album_id, obj=FavoriteAlbum, cache_key_format=FAVORITE_ALBUM_CACHE_KEY)
 
 
 def get_reply_album_count(album_id):
