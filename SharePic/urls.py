@@ -24,8 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('user.urls')),
     path('', include('picture.urls')),
-
-    # 配置 static 和 media
-    static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)[0],
-    static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)[0],
 ]
+
+# 配置 static 和 media
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)[0]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)[0]
