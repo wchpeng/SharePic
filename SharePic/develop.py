@@ -31,3 +31,7 @@ STATIC_ROOT = None
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# celery configure
+CELERY_BROKER_URL = 'redis://172.16.15.203/12'
+CELERY_RESULT_BACKEND = 'redis://172.16.15.203/12'

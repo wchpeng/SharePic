@@ -1,6 +1,8 @@
+from django.core.cache import cache
+
 from user.models import User
 from .models import FavoriteAlbum, Reply, Picture
-from django.core.cache import cache
+from .tasks import update_count
 
 REPLY_ALBUM_CACHE_KEY = "album:replyalbum:{}"
 FAVORITE_ALBUM_CACHE_KEY = "album:favoritealbum:{}"
@@ -47,15 +49,7 @@ def get_reply_album_count(album_id):
 
 def update_reply_album_count(album_id):
     # 更新回复相册数
-    update_count(key="album_id", value=album_id, obj=Reply, cache_key_format=REPLY_ALBUM_CACHE_KEY)
-
-
-def update_count(key, value, obj, cache_key_format):
-    # 保存统计数
-    if not value:
-        return
-    num = obj.objects.filter(**{key: value}).count()
-    cache.set(cache_key_format.format(value), num)
+    update_count.delay(key="album_id", value=album_id, obj=Reply, cache_key_format=REPLY_ALBUM_CACHE_KEY)
 
 
 def get_count(key, value, obj, cache_key_format):
