@@ -19,9 +19,9 @@ class MyselfInfoList(admin.ModelAdmin):
 
     exclude = ["creater", "creater_id"]
 
-    def get_queryset(self, request):
-        qs = super(MyselfInfoList, self).get_queryset(request)
-        return qs.filter(creater_id=request.user.id)
+    # def get_queryset(self, request):
+    #     qs = super(MyselfInfoList, self).get_queryset(request)
+    #     return qs.filter(creater_id=request.user.id)
 
     def save_form(self, request, form, change):
         form.instance.creater_id = request.user.id

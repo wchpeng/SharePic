@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
 
 {% load static %}
+{% load datetime_filters %}
 
 {% block script %}
     <script>
         $(function () {
-            var $q = $("#q");
-            var $keywork_search = $("#kwyword_search");
             var $heart = $(".heart");
 
             $heart.click(function(){
@@ -21,13 +20,6 @@
                     $(this).css("color", "rgb(232, 94, 146)");
                 }
             });
-
-            $keywork_search.click(function () {
-                window.location.href = "http://baidu.com/s" + "?wd=" + $q.val();
-                return false
-            });
-
-
         })
     </script>
 {% endblock %}
@@ -58,24 +50,66 @@
     <div class="container-fluid" style="padding-left:23px;padding-right:23px;background-color:#f0f2f1;padding-top:10px;">
 
         <div class="row">
+            <!--<div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">-->
+                <!--<div class="thumbnail">-->
+                    <!--<a href="http://baidu.com"><img src="{% static 'base/bg_groups/school_flower.jpg' %}" alt="..."></a>-->
+                    <!--<div class="caption">-->
+                        <!--<a href="http://baidu.com/s?wd=穷怎么办" class="text-danger" style="font-size:16px;">校花图</a>-->
+                        <!--<p class="text-muted" style="margin-top:5px;margin-bottom:5px;">15 分钟之前</p>-->
+                        <!--<p>这是我最近的照片，作为一个地球人我认为保护冥王星不受太阳辐射带来的危害使我们的责任和义务。</p>-->
+                    <!--</div>-->
+                    <!--<div style="background-color:#e2e6e4;margin-left:-4px;margin-right:-4px;margin-bottom:-4px;text-indent:6px;line-height:34px;">-->
+                        <!--<a href="#"><span title="点击收藏" class="glyphicon glyphicon-heart heart initialism" aria-hidden="true"></a>-->
+                        <!--<span class="heart_span">1301</span>-->
+                        <!--<a href="#"> <span class="glyphicon glyphicon-comment reply" aria-hidden="true"></a>-->
+                        <!--<span class="heart_span">57</span>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+            {% for value in values %}
+
             <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
                 <div class="thumbnail">
-                    <a href="http://baidu.com"><img src="{% static 'base/bg_groups/school_flower.jpg' %}" alt="..."></a>
+                    <a href="http://baidu.com"><img src="{{ value.first_picture }}" alt="..."></a>
                     <div class="caption">
-                        <a href="http://baidu.com/s?wd=穷怎么办" class="text-danger" style="font-size:16px;">校花图</a>
-                        <p class="text-muted" style="margin-top:5px;margin-bottom:5px;">15 分钟之前</p>
-                        <p>这是我最近的照片，作为一个地球人我认为保护冥王星不受太阳辐射带来的危害使我们的责任和义务。</p>
+                        <!--<a href="http://baidu.com/s?wd=穷怎么办" class="text-danger" style="font-size:16px;">校花图</a>-->
+                        <a href="{% url 'user:user_info' value.creater_id %}" class="text-danger">{{ value.user__username }}</a>
+                        <p class="text-muted" style="margin-top:5px;margin-bottom:5px;font-size:12px;">{{ value.create_time|datetime_semantization }}</p>
+                        <p style="font-size:13px;">{{ value.desc|limit_str_len:42 }}</p>
                     </div>
                     <div style="background-color:#e2e6e4;margin-left:-4px;margin-right:-4px;margin-bottom:-4px;text-indent:6px;line-height:34px;">
-                        <a href="#"><span title="点击收藏" class="glyphicon glyphicon-heart heart initialism" aria-hidden="true"></a>
-                        <span class="heart_span">1301</span>
-                        <a href="#"> <span class="glyphicon glyphicon-comment reply" aria-hidden="true"></a>
-                        <span class="heart_span">57</span>
+                        <a href="#"><span title="点击收藏" class="glyphicon glyphicon-heart heart initialism" aria-hidden="true"></span></a>
+                        <span class="heart_span">{{ value.favorite_count }}</span>
+                        <a href="#"> <span class="glyphicon glyphicon-comment reply" aria-hidden="true"></span></a>
+                        <span class="heart_span">{{ value.reply_count }}</span>
                     </div>
                 </div>
             </div>
 
+            {% endfor %}
         </div>
-
     </div>
+
+    <!--分页-->
+    <nav aria-label="Page navigation" style="text-align:center;">
+        <ul class="pagination pagination-lg">
+            {% if page.number == 1 %}
+            <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+            {% else %}
+            <li><a href="{% url 'picture:index' %}?q={{ q }}&page_no={{ page.number|add:-1 }}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+            {% endif %}
+
+            {% for i in page.paginator.page_range %}
+            {% if i == page.number %}<li class="active">{% else %}<li>{% endif %}
+                <a href="{% url 'picture:index' %}?q={{ q }}&page_no={{ i }}">{{ i }}</a>
+            </li>
+            {% endfor %}
+
+            {% if page.has_next %}<li><a href="{% url 'picture:index' %}?q={{ q }}&page_no={{i|add:-1}}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+            {% else %}
+            <li class="disabled"><a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
 {% endblock %}

@@ -19,7 +19,8 @@
             var $keywork_search = $("#kwyword_search");
 
             $keywork_search.click(function () {
-                window.location.href = "http://baidu.com/s" + "?wd=" + $q.val();
+                window.location.href = "{% url 'picture:index' %}" + "?q=" + $q.val();
+                <!--window.location.href = "http://baidu.com/s" + "?wd=" + $q.val();-->
                 return false
             });
         })
@@ -71,7 +72,7 @@
 
 
     <div style="text-align:center;padding-top:20px;">
-        <p>Copyright 2019 by Owner(wcp) - 备案信息 - <a href="/">手机版</a> - <a href="mailto:smartwu_sir@163.com">联系我</a></p>
+        <p>Copyright 2019 by Owner(wcp) - 不可知之地 - <a href="/">手机版</a> - <a href="mailto:smartwu_sir@163.com">联系我</a></p>
     </div>
 </body>
 
