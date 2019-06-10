@@ -2,12 +2,14 @@
 
 from SharePic.settings import *  # NOQA
 
+DEBUG = False
+
 # config cache to use redis
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        # 'LOCATION': 'redis://127.0.0.1:6379/11',
-        'LOCATION': 'redis://172.16.15.203:6379/11',
+        'LOCATION': 'redis://127.0.0.1:6379/11',
+        # 'LOCATION': 'redis://172.16.15.203:6379/11',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             # 'PASSWORD': 'my secret',
@@ -21,3 +23,6 @@ CACHES = {
 # config session to use redis
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
+
+STATIC_ROOT = '/var/www/wcp/SharePic/static'
+MEDIA_ROOT = '/var/www/wcp/SharePic/media'

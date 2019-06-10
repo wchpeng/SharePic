@@ -75,7 +75,7 @@
                         <!--<a href="http://baidu.com/s?wd=穷怎么办" class="text-danger" style="font-size:16px;">校花图</a>-->
                         <a href="{% url 'user:user_info' value.creater_id %}" class="text-danger">{{ value.user__username }}</a>
                         <p class="text-muted" style="margin-top:5px;margin-bottom:5px;font-size:12px;">{{ value.create_time|datetime_semantization }}</p>
-                        <p style="font-size:13px;">{{ value.desc|limit_str_len:42 }}</p>
+                        <p style="font-size:13px;height:36px;">{{ value.desc|limit_str_len:90 }}</p>
                     </div>
                     <div style="background-color:#e2e6e4;margin-left:-4px;margin-right:-4px;margin-bottom:-4px;text-indent:6px;line-height:34px;">
                         <a href="#"><span title="点击收藏" class="glyphicon glyphicon-heart heart initialism" aria-hidden="true"></span></a>

@@ -37,7 +37,7 @@ class MyRegisterView(View):
 
 
 class UserInfoView(LoginRequiredMixin, View):
-    login_url = reverse('user:uer_login')
+    login_url = reverse('user:user_login')
 
     # 用户信息: /user/info/12/
     def get(self, request, *args, **kwargs):
