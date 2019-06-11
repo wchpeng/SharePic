@@ -11,4 +11,5 @@ urlpatterns = [
     path('register/', views.MyRegisterView.as_view(), name='user_register'),
     path('info/<int:user_id>/', views.UserInfoView.as_view(), name="user_info"),
     path('info/', views.MyUserInfoView.as_view(), name='my_user_info'),
+    path('exist/', views.CheckUserOrEmailExist.as_view(), name='check_user_exist'),
 ]

@@ -10,16 +10,31 @@
 
             $heart.click(function(){
                 // 点击收藏切换图标颜色
-                var $heart_n_span = $(this).parent().next()
+                id = $(this).attr("id");
+                $.ajax({
+                    url: "{% url 'picture:get_favorite_album' %}" + "?album_id=" + id,
+                    type: 'GET',
+                    success: function(data, status, xhr){
+                        if (data.code == 0) {
+                            toggle_heart_color(id);
+                        }
+                    }
+                })
+            });
+
+            var toggle_heart_color = function(id) {
+                // 切换收藏图标颜色
+                $current = $("#" + id);
+                var $heart_n_span = $current.parent().next();
                 var heart_count = parseInt($heart_n_span.text());
-                if ($(this).css("color") == "rgb(232, 94, 146)"){
+                if ($current.css("color") == "rgb(232, 94, 146)"){
                     $heart_n_span.html(heart_count - 1);
-                    $(this).css("color", "rgb(128, 128, 128)");
+                    $current.css("color", "rgb(128, 128, 128)");
                 } else {
                     $heart_n_span.html(heart_count + 1);
-                    $(this).css("color", "rgb(232, 94, 146)");
+                    $current.css("color", "rgb(232, 94, 146)");
                 }
-            });
+            }
         })
     </script>
 {% endblock %}
@@ -31,7 +46,6 @@
         }
         .heart {
             font-size: 16px;
-            color: gray;
         }
         .reply {
             font-size: 16px;
@@ -40,6 +54,11 @@
         .heart_span {
             font-size: 16px;
         }
+
+        a:link{text-decoration:none;   /* 指正常的未被访问过的链接*/}
+        a:visited{text-decoration:none; /*指已经访问过的链接*/}
+        a:hover{text-decoration:none;/*指鼠标在链接*/}
+        a:active{text-decoration:none;/* 指正在点的链接*/ }
 
     </style>
 {% endblock %}
@@ -70,7 +89,7 @@
 
             <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
                 <div class="thumbnail">
-                    <a href="http://baidu.com"><img src="{{ value.first_picture }}" alt="..."></a>
+                    <a href="{% url 'picture:album_info' value.id %}"><img src="{{ value.first_picture }}" alt="..."></a>
                     <div class="caption">
                         <!--<a href="http://baidu.com/s?wd=穷怎么办" class="text-danger" style="font-size:16px;">校花图</a>-->
                         <a href="{% url 'user:user_info' value.creater_id %}" class="text-danger">{{ value.user__username }}</a>
@@ -78,9 +97,15 @@
                         <p style="font-size:13px;height:36px;">{{ value.desc|limit_str_len:90 }}</p>
                     </div>
                     <div style="background-color:#e2e6e4;margin-left:-4px;margin-right:-4px;margin-bottom:-4px;text-indent:6px;line-height:34px;">
-                        <a href="#"><span title="点击收藏" class="glyphicon glyphicon-heart heart initialism" aria-hidden="true"></span></a>
+                        <a href="javascript:">
+                            {% if value.is_favorite %}
+                            <span title="点击收藏" style="color:rgb(232, 94, 146);" class="glyphicon glyphicon-heart heart initialism" aria-hidden="true" id="{{ value.id }}"></span>
+                            {% else %}
+                            <span title="点击收藏" style="color:gray;" class="glyphicon glyphicon-heart heart initialism" aria-hidden="true" id="{{ value.id }}"></span>
+                            {% endif %}
+                        </a>
                         <span class="heart_span">{{ value.favorite_count }}</span>
-                        <a href="#"> <span class="glyphicon glyphicon-comment reply" aria-hidden="true"></span></a>
+                        <a href="javascript:"> <span class="glyphicon glyphicon-comment reply" aria-hidden="true"></span></a>
                         <span class="heart_span">{{ value.reply_count }}</span>
                     </div>
                 </div>

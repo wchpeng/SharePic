@@ -1,5 +1,5 @@
-{% load static %}
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -101,8 +101,11 @@
             var $login_pwd = $("#login-pwd");
             var $login_name = $("#login-name");
             var $login_name_tips = $("#login-name-tips");
+            var $login_name_tips2 = $("#login-name-tips2");
             var $register_name_tips = $("#register-name-tips");
+            var $register_name_tips2 = $("#register-name-tips2");
             var $register_email_tips = $("#register-email-tips");
+            var $register_email_tips2 = $("#register-email-tips2");
             var $login_submit = $("#login-submit");
             var $register_submit = $("#register-submit");
             var $login = $("#login");
@@ -115,7 +118,7 @@
             var valid_register_name = false;
             var valid_register_email = false;
             var bg_count = 0;
-            var bg_groups = ["{% static "base/bg_groups/school_flower.jpg" %}", "{% static "base/bg_groups/beihaidao.jpg" %}", "{% static "base/bg_groups/school_flower2.jpg" %}", "{% static "base/bg_groups/green.jpg" %}", "{% static "base/bg_groups/dream.jpg" %}"]
+            var bg_groups = ["{% static "base/bg_groups/school_flower.jpg" %}", "{% static "base/bg_groups/school_flower2.jpg" %}", "{% static "base/bg_groups/green.jpg" %}", "{% static "base/bg_groups/dream.jpg" %}"]
 
             change_div_width_by_document_width();
             $(window).resize(function(){
@@ -132,6 +135,7 @@
                 if (reg.test(ret) == true || ret == ""){
                     if (ret != ""){
                         valid_register_email = true;
+                        verify_email_exist(ret, "register")
                     } else {
                         valid_register_email = false;
                     }
@@ -153,6 +157,7 @@
                     if (reg.test(ret) == true || ret == ""){
                         if (ret != ""){
                             valid_register_name = true;
+                            verify_username_exist(ret, "register")
                         } else {
                             valid_register_name = false;
                         }
@@ -178,6 +183,7 @@
                     if (reg.test(ret) == true || ret == ""){
                         if (ret != ""){
                             valid_login_name = true;
+                            verify_username_exist(ret, "login")
                         } else {
                             valid_login_name = false;
                         }
@@ -258,6 +264,67 @@
                 $login_register_info.css("width", div_width);
             }
 
+            function verify_username_exist(username, operate){
+                $.ajax({
+                    url: "{% url 'user:check_user_exist' %}" + "?username=" + username,
+                    type: "GET",
+                    success: function(data, status, xhr){
+                        console.log(data);
+                        var exist = false;
+                        if (data.code != 0){
+                            exist = false
+                        } else {
+                            exist = data.data.exist
+                        }
+
+                        if (exist == false && operate == "login"){
+                            valid_login_name = false;
+                            $login_name_tips2.show();
+                        } else if (exist == true && operate == "register"){
+                            valid_register_name = false;
+                            $register_name_tips2.show();
+                        }
+                        else {
+                            valid_login_name = true;
+                            valid_register_name = true;
+                            $login_name_tips2.hide();
+                            $register_name_tips2.hide()
+                        }
+                    },
+                    error: function(){
+                        $login_name_tips2.hide();
+                        $register_name_tips2.hide();
+                    }
+                })
+            }
+
+            function verify_email_exist(email, operate){
+                $.ajax({
+                    url: "{% url 'user:check_user_exist' %}" + "?email=" + email,
+                    type: "GET",
+                    success: function(data, status, xhr){
+                        console.log(data);
+                        var exist = false;
+                        if (data.code != 0){
+                            exist = false
+                        } else {
+                            exist = data.data.exist
+                        }
+
+                        if (exist == false){
+                            valid_register_email = true;
+                            $register_email_tips2.hide();
+                        } else {
+                            valid_register_email = false;
+                            $register_email_tips2.show();
+                        }
+                    },
+                    error: function(){
+                        $register_email_tips2.hide();
+                    }
+                })
+            }
+
             function change_background(){
                 $pictures.css("background-image", 'url("' + bg_groups[bg_count % bg_groups.length] + '")');
                 bg_count += 1;
@@ -280,7 +347,7 @@
 
         <div class="form">
             <div id="register-form" style="display:none;">
-                <div style="font-size:35px;margin-bottom:33px;">欢迎注册ponk</div>
+                <div style="font-size:35px;margin-bottom:33px;">欢迎注册 lemonk</div>
                 <div style="font-size:20px;margin-bottom:60px;">乐于分享，助人利己。</div>
                 <form action="/user/register/" method="post" id="register">
                     {% csrf_token %}
@@ -289,12 +356,14 @@
                     </div>
                     <div class="input-block">
                         <div class="error-tips" id="register-name-tips">! 用户名不规范，应大于8个字符，由数字/字母/下划线组成</div>
+                        <div class="error-tips" id="register-name-tips2">! 该账户已存在</div>
                     </div>
                     <div class="input-content">
                         <input type="text" class="auto-input" name="email" id="register-email" placeholder="Email">
                     </div>
                     <div class="input-block">
                         <div class="error-tips" id="register-email-tips">! 邮箱格式错误</div>
+                        <div class="error-tips" id="register-email-tips2">! 邮箱已存在</div>
                     </div>
                     <div class="input-content">
                         <input type="password" class="auto-input" name="password" id="register-pwd" placeholder="密码">
@@ -308,7 +377,7 @@
             </div>
 
             <div id="login-form">
-                <div style="font-size:35px;margin-bottom:33px;">欢迎登录ponk</div>
+                <div style="font-size:35px;margin-bottom:33px;">欢迎登录 lemonk</div>
                 <div style="font-size:20px;margin-bottom:60px;">分享，你我更亲近。</div>
                 <form action="/user/login/" method="post" id="login">
                     {% csrf_token %}
@@ -317,6 +386,7 @@
                     </div>
                     <div class="input-block">
                         <div class="error-tips" id="login-name-tips">! 用户名不规范或邮箱格式错误</div>
+                        <div class="error-tips" id="login-name-tips2">! 用户名不存在</div>
                     </div>
                     <div class="input-content">
                         <input type="password" class="auto-input" name="password" id="login-pwd" placeholder="密码">

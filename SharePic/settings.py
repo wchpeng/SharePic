@@ -144,4 +144,8 @@ LOGGING = {
 # celery configure
 CELERY_BROKER_URL = 'redis://127.0.0.1/12'
 CELERY_RESULT_BACKEND = 'redis://127.0.0.1/12'
-CELERY_RESULT_SERIALIZER = 'json'
+# CELERY_RESULT_SERIALIZER = 'json'
+
+# cache key format
+REPLY_ALBUM_CACHE_KEY = "album:replyalbum:{}"
+FAVORITE_ALBUM_CACHE_KEY = "album:favoritealbum:{}"
