@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 from django.urls import reverse_lazy as reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from django.views.generic.base import View, TemplateView
