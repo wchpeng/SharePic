@@ -1,8 +1,7 @@
-from django.shortcuts import render
 from django.urls import reverse_lazy as reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from django.views.generic.base import View, TemplateView
-from django.contrib.auth.views import LoginView, LogoutView, login_required
+from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import User
@@ -54,7 +53,7 @@ class MyUserInfoView(LoginRequiredMixin, View):
 
 
 class CheckUserOrEmailExist(View):
-    
+
     def get(self, request, *args, **kwargs):
         user_name = request.GET.get("username")
         email = request.GET.get("email")
