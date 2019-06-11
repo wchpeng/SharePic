@@ -6,7 +6,7 @@ from celery import Celery
 env = os.environ.get("PY3_DJANGO2_SETTING_ENV", "develop")
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'SharePic.%s' % env)
 
-app = Celery('share_pic')
+app = Celery('SharePic')
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
