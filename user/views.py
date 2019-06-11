@@ -54,6 +54,7 @@ class MyUserInfoView(LoginRequiredMixin, View):
 
 
 class CheckUserOrEmailExist(View):
+    
     def get(self, request, *args, **kwargs):
         user_name = request.GET.get("username")
         email = request.GET.get("email")
