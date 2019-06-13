@@ -131,5 +131,6 @@ CELERY_RESULT_BACKEND = 'redis://127.0.0.1/12'
 # CELERY_RESULT_SERIALIZER = 'json'
 
 # cache key format
-REPLY_ALBUM_CACHE_KEY = "album:replyalbum:{}"
-FAVORITE_ALBUM_CACHE_KEY = "album:favoritealbum:{}"
+REPLY_ALBUM_CACHE_KEY = "album:replyalbum:{}"  # 回复数
+FAVORITE_ALBUM_CACHE_KEY = "album:favoritealbum:{}"  # 收藏數
+ALBUM_REVIEWS_CACHE_KEY = "album:reviews:{}"  # 回复

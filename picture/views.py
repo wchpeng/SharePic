@@ -3,10 +3,11 @@ from django.core.paginator import Paginator
 from django.db.models.query_utils import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy as reverse
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
+from django.forms.models import model_to_dict
 
 from .models import Picture, Album, FavoriteAlbum
-from .utils import extend_count, update_favorite_album_count
+from .utils import extend_albums_count, update_favorite_album_count, extend_album_info
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
@@ -28,7 +29,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
         albums = page.object_list
         values = albums.values("id", "create_time", "title", "desc", "creater_id", "first_picture_id")
         if values:
-            extend_count(values, self.request.user.id)  # 扩展收藏数、回复数、用户名、第一张图片
+            extend_albums_count(values, self.request.user.id)  # 扩展收藏数、回复数、用户名、第一张图片
 
         kwargs["values"] = values
         kwargs["page"] = page
@@ -48,7 +49,16 @@ class AlbumInfoView(LoginRequiredMixin, View):
     login_url = reverse('user:user_login')
 
     def get(self, request, album_id, *args, **kwargs):
-        return JsonResponse({"code": 0, "msg": "成功", "data": "暂未开发"})
+        # 相冊詳情
+        try:
+            album_info = Album.objects.get(id=album_id)
+        except Album.DoesNotExist:
+            return Http404("沒有改相冊。")
+        di = album_info.to_dict(("id", "title", "desc", "creater_id", "create_time"))
+
+        extend_album_info(di, request.user.id)
+
+        return JsonResponse({"code": 0, "msg": "成功", "data": di})
 
     def put(self, request, album_id, *args, **kwargs):
         return JsonResponse({"code": 0, "msg": "成功", "data": "暂未开发"})

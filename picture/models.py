@@ -1,4 +1,12 @@
+from itertools import chain
+from collections import defaultdict, OrderedDict
+
 from django.db import models
+from django.core.cache import cache
+from django.conf import settings
+
+from user.models import User
+from SharePic.utils import cache_value
 
 
 class Picture(models.Model):
@@ -33,6 +41,31 @@ class Album(models.Model):
     class Meta:
         verbose_name = "相册"
         verbose_name_plural = "相册"
+
+    def to_dict(self, fields=None, exclude=None, ext=True):
+        opts = self._meta
+        data = {}
+
+        for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
+            if fields and f.name not in fields:
+                continue
+            if exclude and f.name in exclude:
+                continue
+            data[f.name] = f.value_from_object(self)
+
+        if ext:
+            data["reviews"] = self.get_reviews()
+            data["pictures"] = self.get_pictures()
+
+        return data
+
+    @cache_value(settings.ALBUM_REVIEWS_CACHE_KEY, "id")
+    def get_reviews(self):
+        return get_albums_reviews_info(self.id)
+
+    def get_pictures(self):
+        data = Picture.objects.filter(album_id=self.id).only("picture")
+        return [{"picture": i.picture.url} for i in data]
 
 
 class AlbumCategory(models.Model):
@@ -89,3 +122,35 @@ class FavoriteAlbum(models.Model):
     class Meta:
         verbose_name = "点赞"
         verbose_name_plural = "点赞"
+
+
+def get_field_info_id_map(kclass, ids, field):
+    usernames = kclass.objects.filter(id__in=ids).values("id", field)
+    return {u["id"]: u[field] for u in usernames}
+
+
+def get_albums_reviews_info(album_id):
+    # 传入相册id，获取相册的回复信息
+    replies = (
+        Reply.objects.filter(album_id=album_id)
+        .order_by("-id")
+        .values(
+            "id", "album_id", "parent_reply", "content", "creater_id", "create_time"
+        )
+    )
+    creater_ids = list(set([rep["creater_id"] for rep in replies]))
+    user_id_name_map = get_field_info_id_map(User, creater_ids, "username")
+
+    first_replies = OrderedDict()
+    second_replies = defaultdict(list)
+    for rep in replies:
+        rep["creater_username"] = user_id_name_map.get(rep["creater_id"], "")
+        if rep["parent_reply"] == 0:
+            first_replies[rep["id"]] = rep
+        else:
+            second_replies[rep["parent_reply"]].append(rep)
+
+    for k in first_replies:
+        first_replies[k]["replies"] = second_replies.get(k, [])
+
+    return list(first_replies.values())
