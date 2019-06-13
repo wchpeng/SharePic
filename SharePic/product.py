@@ -66,7 +66,7 @@ LOGGING = {
         'request_handler': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': '/home/wcp/var/logs/SharePic_script.log',
+            'filename': '/home/wcp/var/logs/SharePic_request.log',
             'maxBytes': 1024*1024*5,
             'backupCount': 5,
             'formatter':'standard',
