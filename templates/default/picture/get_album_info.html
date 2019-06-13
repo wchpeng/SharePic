@@ -11,7 +11,38 @@
 	 crossorigin="anonymous">
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
 	 crossorigin="anonymous"></script>
+
+	<script src="../emoji/js/jquery.min.js"></script>
+	<script type="text/javascript" src="../emoji/js/jquery.qqFace.js"></script>
 	<title>Document</title>
+
+	<script>
+		$(function () {
+			$("#description").focus(function () {
+				$('textarea').each(function () {
+					this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
+				}).on('input', function () {
+					this.style.height = 'auto';
+					this.style.height = (this.scrollHeight) + 'px';
+				});
+			});
+
+			$('.emotion').qqFace({
+				id: 'facebox',
+				assign: 'description',
+				path: '../emoji/arclist/'	//表情存放的路径
+			});
+
+			//查看结果
+			function replace_em(str) {
+				str = str.replace(/\</g, '&lt;');
+				str = str.replace(/\>/g, '&gt;');
+				str = str.replace(/\n/g, '<br/>');
+				str = str.replace(/\[em_([0-9]*)\]/g, '<img src="arclist/$1.gif" border="0" />');
+				return str;
+			}
+		})
+	</script>
 
 	<style>
 		body {
@@ -116,6 +147,56 @@
 			border-radius: 5px;
 			width: 100%;
 			height: 100%;
+		}
+
+		.review-other {
+			float: right;
+		}
+
+		.review {
+			line-height: 24px;
+			height: 24px;
+			font-size: 13px;
+		}
+
+		.review-head-proto {
+			width: 85%;
+		}
+
+		.review-border {
+			padding: 15px;
+			/* padding-bottom: 15px;
+			padding-left: 15px;
+			padding-right: 15px; */
+		}
+
+		.review-border .border {
+			border-top: 1px solid #aba;
+		}
+
+		.second-review-inner {
+			background-color: #ddd;
+			padding: 0px 13px 0px 13px;
+		}
+
+		a:link {
+			text-decoration: none;
+			/* 指正常的未被访问过的链接*/
+		}
+
+		a:visited {
+			text-decoration: none;
+			/*指已经访问过的链接*/
+		}
+
+		a:hover {
+			text-decoration: none;
+			/*指鼠标在链接*/
+		}
+
+		a:active {
+			text-decoration: none;
+			/* 指正在点的链接*/
 		}
 	</style>
 
@@ -229,10 +310,18 @@
 			</div>
 			<div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 album-footer">
 				<div class="cell">
-					<a>收藏（13）</a>
+					<!-- <a href="javascript:">收藏（13）</a> -->
+					<a href="javascript:">
+						<span title="点击喜欢" style="color:rgb(232, 94, 146);" class="glyphicon glyphicon-heart heart initialism" aria-hidden="true">
+						</span>
+					</a>
 				</div>
-				<div class="cell" style="border-left:1px dashed gray;">评论（56）</div>
-				<div class="cell" style="border-left:1px dashed gray;">点赞（99）</div>
+				<div class="cell" style="border-left:1px dashed gray;">
+					<a href="javascript:">评论（56）</a>
+				</div>
+				<div class="cell" style="border-left:1px dashed gray;">
+					<a href="javascript:">点赞（99）</a>
+				</div>
 			</div>
 
 			<div style="height:16px;" class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12"></div>
@@ -240,16 +329,88 @@
 			<div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 album-footer">
 				<div class="b_main2">
 					<div class="border2">
-                        <div class="review">
-                            <div class="col-xs-2"> <div class="col-xs-10 col-cs-offset-0"> <img src="./2.jpg" alt="" style="width:100%;"></div></div>
-                        </div>
-						<div class="out2">
-							<div class="in2"></div>
+						<div class="post-review">
+							<div class="col-xs-1" style="padding-right:0px;padding-bottom:15px;">
+								<!-- <div class="col-xs-12 col-cs-offset-0"> -->
+								<img src="./2.jpg" alt="" class="review-head-proto">
+								<!-- </div> -->
+							</div>
+
+							<form action="/picture/review/info/" method="POST">
+								<div class="col-xs-11" style="padding-left:5px;">
+									<textarea type="text" class="form-control pull-left" rows="1" id="description" name="description"></textarea>
+
+									<button type="button" class="btn btn-default emotion" style="margin-top:5px;">
+										<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>
+									</button>
+									<button type="submit" class="btn btn-warning" style="float:right;margin-top:5px;">评论</button>
+								</div>
+							</form>
 						</div>
+						<div class="one-review">
+							<div class="review-border col-xs-12">
+								<div class="border"></div>
+							</div>
+							<div class="col-xs-1" style="padding-right:0px;">
+								<!-- <div class="col-xs-12 col-cs-offset-0"> -->
+								<img src="./2.jpg" alt="" class="review-head-proto">
+								<!-- </div> -->
+							</div>
+							<div class="col-xs-11" style="padding-left:5px;">
+								<div class="review">
+									<!-- <span style="color: orange">今朝有酒今朝醉：</span>这个是真的皮哦 -->
+									<a href="#" style="color: orange">今朝有酒今朝醉：</a>这个是真的皮哦
+								</div>
+								<div class="review">
+									<span class="review-createtime">52 分钟之前</span>
+									<span class="review-other">
+										<a href="#">回复</a> | 赞</span>
+								</div>
+							</div>
+						</div>
+						<div class="one-review">
+							<div class="review-border col-xs-12">
+								<div class="border"></div>
+							</div>
+							<div class="col-xs-1" style="padding-right:0px;">
+								<!-- <div class="col-xs-12 col-cs-offset-0"> -->
+								<img src="./2.jpg" alt="" class="review-head-proto">
+								<!-- </div> -->
+							</div>
+							<div class="col-xs-11" style="padding-left:5px;">
+								<div class="review">
+									<!-- <span style="color: orange">今朝有酒今朝醉：</span>这个是真的皮哦 -->
+									<a href="#" style="color: orange">今朝有酒今朝醉：</a>这个是真的皮哦
+								</div>
+								<div class="review">
+									<span class="review-createtime">52 分钟之前</span>
+									<span class="review-other">
+										<a href="#">回复</a> | 赞</span>
+								</div>
+							</div>
+							<div class="col-xs-11 col-xs-offset-1" style="padding-left:5px;">
+								<div class="second-review-inner">
+									<div class="review">
+										<!-- <span style="color: orange">今朝有酒今朝醉：</span>这个是真的皮哦 -->
+										<a href="#" style="color: orange">今朝有酒今朝醉：</a>这个是真的皮哦
+									</div>
+									<div class="review">
+										<span class="review-createtime">50 分钟之前</span>
+										<span class="review-other">
+											<a href="#">回复</a> | 赞</span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+					<div class="out2">
+						<div class="in2"></div>
 					</div>
 				</div>
 			</div>
 		</div>
+	</div>
 
 	</div>
 </body>
