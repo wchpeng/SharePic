@@ -51,16 +51,17 @@
 				cur = $(this);
 				var ppp_review = cur.parent().parent().parent();
 				var form_id = ppp_review.attr("id") + '-form';
+				var reply_username = cur.parent().parent().prev().children().text()
 
 				if ($("#" + form_id).length > 0) {
 					$("#" + form_id).remove();
 				} else {
 					ppp_review.after(
 						'<form action="/picture/review/info/" method="POST" id="' + form_id + '">\
-						<div class="col-xs-11 col-xs-offset-1" style="padding-left:5px;padding-top: 10px;padding-bottom: 10px;"> \
+						<div class="col-xs-11 col-xs-offset-1" style="padding-left:5px;padding-top: 10px;padding-bottom: 10px; padding-bottom:6px;"> \
 							<input type="hidden" value="1" name="album_id">\
 							<input type="hidden" value="0" name="parent_reply">\
-							<textarea type="text" class="form-control pull-left" rows="1" id="description' + form_id + '" name="description"></textarea>\
+							<textarea type="text" class="form-control pull-left" rows="1" id="description' + form_id + '" name="description">@' + reply_username + '</textarea>\
 							<button type="button" class="btn btn-default emotion' + form_id + '" style="margin-top:5px;">\
 								<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>\
 							</button>\
@@ -95,16 +96,17 @@
 				var ppp_review = cur.parent().parent().parent();
 				var form_id = ppp_review.attr("id") + '-form';
 				var parent_review_id = ppp_review.parent().siblings().slice(2).attr("id");
+				var reply_username = cur.parent().parent().prev().children().text();
 
 				if ($("#" + form_id).length > 0) {
 					$("#" + form_id).remove();
 				} else {
 					ppp_review.after(
 						'<form action="/picture/review/info/" method="POST" id="' + form_id + '">\
-							<div class="col-xs-12" style="padding-left:5px;padding-top: 10px;background-color: #ddd"> \
+							<div class="col-xs-12" style="padding-left:5px;padding-top: 10px;background-color: #ddd; padding-bottom:6px;"> \
 								<input type="hidden" value="1" name="album_id">\
 								<input type="hidden" value="'+ parseInt(parent_review_id) + '" name="parent_reply">\
-								<textarea type="text" class="form-control pull-left" rows="1" id="description' + form_id + '" name="description"></textarea>\
+								<textarea type="text" class="form-control pull-left" rows="1" id="description' + form_id + '" name="description">@'+ reply_username +'</textarea>\
 								<button type="button" class="btn btn-default emotion' + form_id + '" style="margin-top:5px;">\
 									<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>\
 								</button>\
