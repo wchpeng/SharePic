@@ -59,7 +59,7 @@ class Album(models.Model):
 
         return data
 
-    @cache_value(settings.ALBUM_REVIEWS_CACHE_KEY, "id")
+    # @cache_value(settings.ALBUM_REVIEWS_CACHE_KEY, "id")
     def get_reviews(self):
         return get_albums_reviews_info(self.id)
 

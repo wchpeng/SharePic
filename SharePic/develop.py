@@ -6,8 +6,8 @@ from SharePic.settings import *  # NOQA
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/11',
-        # 'LOCATION': 'redis://172.16.15.203:6379/11',
+        # 'LOCATION': 'redis://127.0.0.1:6379/11',
+        'LOCATION': 'redis://172.16.15.203:6379/11',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             # 'PASSWORD': 'my secret',

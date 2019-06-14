@@ -1,23 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
 
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-
-    scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-	 crossorigin="anonymous">
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-	 crossorigin="anonymous"></script>
+{% load static %}
+{% load datetime_filters %}
 
-	<script src="../emoji/js/jquery.min.js"></script>
-	<script type="text/javascript" src="../emoji/js/jquery.qqFace.js"></script>
-	<title>Document</title>
-
+{% block script %}
+	<link rel="stylesheet" href="{% static 'base/emoji/css/reset.css' %}">
+	<script type="text/javascript" src="{% static 'base/emoji/js/jquery.qqFace.js' %}"></script>
 	<script>
 		$(function () {
+			jQuery.browser = {}; (function () { jQuery.browser.msie = false; jQuery.browser.version = 0; if (navigator.userAgent.match(/MSIE ([0-9]+)./)) { jQuery.browser.msie = true; jQuery.browser.version = RegExp.$1; } })();
+
+			var $horizontal_pic = $(".horizontal-pic");
+			var $carousel_pic = $(".carousel-pic");
+			var $rounded_image = $(".rounded-image");
+			var $close_carousel = $(".close-carousel");
+			var $second_reply_review = $(".second-reply-review");
+			var $third_reply_reply = $(".third-reply-reply");
+
 			$("#description").focus(function () {
 				$('textarea').each(function () {
 					this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
@@ -30,7 +29,7 @@
 			$('.emotion').qqFace({
 				id: 'facebox',
 				assign: 'description',
-				path: '../emoji/arclist/'	//表情存放的路径
+				path: '{% static "base/emoji/arclist/" %}'	//表情存放的路径
 			});
 
 			//查看结果
@@ -41,9 +40,113 @@
 				str = str.replace(/\[em_([0-9]*)\]/g, '<img src="arclist/$1.gif" border="0" />');
 				return str;
 			}
+
+			$rounded_image.click(hide_horizontal_pic);
+			$close_carousel.click(hide_carousel_pic);
+			$second_reply_review.click(toggle_second_reply_review_form);
+			$third_reply_reply.click(toggle_third_reply_reply_form);
+
+			function toggle_second_reply_review_form() {
+				// 切换或隐藏一级回复的回复‘评论框’
+				cur = $(this);
+				var ppp_review = cur.parent().parent().parent();
+				var form_id = ppp_review.attr("id") + '-form';
+
+				if ($("#" + form_id).length > 0) {
+					$("#" + form_id).remove();
+				} else {
+					ppp_review.after(
+						'<form action="/picture/review/info/" method="POST" id="' + form_id + '">\
+						<div class="col-xs-11 col-xs-offset-1" style="padding-left:5px;padding-top: 10px;padding-bottom: 10px;"> \
+							<input type="hidden" value="1" name="album_id">\
+							<input type="hidden" value="0" name="parent_reply">\
+							<textarea type="text" class="form-control pull-left" rows="1" id="description' + form_id + '" name="description"></textarea>\
+							<button type="button" class="btn btn-default emotion' + form_id + '" style="margin-top:5px;">\
+								<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>\
+							</button>\
+							<button type="submit" class="btn btn-warning" style="float:right;margin-top:5px;">评论</button>\
+						</div>\
+					</form>'
+					);
+
+					var description_id = "description" + form_id;
+					var emotion_cls = "emotion" + form_id;
+
+					$("#" + description_id).focus(function () {
+						$('textarea').each(function () {
+							this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
+						}).on('input', function () {
+							this.style.height = 'auto';
+							this.style.height = (this.scrollHeight) + 'px';
+						});
+					});
+
+					$("." + emotion_cls).qqFace({
+						id: 'facebox2',
+						assign: "description" + form_id,
+						path: '{% static "base/emoji/arclist/" %}'	//表情存放的路径
+					});
+				}
+			}
+			function toggle_third_reply_reply_form() {
+				// 切换或隐藏二级回复的回复‘评论框’
+				var cur = $(this);
+
+				var ppp_review = cur.parent().parent().parent();
+				var form_id = ppp_review.attr("id") + '-form';
+				var parent_review_id = ppp_review.parent().siblings().slice(2).attr("id");
+
+				if ($("#" + form_id).length > 0) {
+					$("#" + form_id).remove();
+				} else {
+					ppp_review.after(
+						'<form action="/picture/review/info/" method="POST" id="' + form_id + '">\
+							<div class="col-xs-12" style="padding-left:5px;padding-top: 10px;background-color: #ddd"> \
+								<input type="hidden" value="1" name="album_id">\
+								<input type="hidden" value="'+ parseInt(parent_review_id) + '" name="parent_reply">\
+								<textarea type="text" class="form-control pull-left" rows="1" id="description' + form_id + '" name="description"></textarea>\
+								<button type="button" class="btn btn-default emotion' + form_id + '" style="margin-top:5px;">\
+									<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>\
+								</button>\
+								<button type="submit" class="btn btn-warning" style="float:right;margin-top:5px;">评论</button>\
+							</div>\
+						</form>'
+					);
+					var description_id = "description" + form_id;
+					var emotion_cls = "emotion" + form_id;
+
+					$("#" + description_id).focus(function () {
+						$('textarea').each(function () {
+							this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
+						}).on('input', function () {
+							this.style.height = 'auto';
+							this.style.height = (this.scrollHeight) + 'px';
+						});
+					});
+
+					$("." + emotion_cls).qqFace({
+						id: 'facebox2',
+						assign: "description" + form_id,
+						path: '{% static "base/emoji/arclist/" %}'	//表情存放的路径
+					});
+				}
+			}
+
+			function hide_horizontal_pic() {
+				// 切换轮播图和平铺图显示/隐藏
+				$horizontal_pic.hide();
+				$carousel_pic.show();
+			}
+			function hide_carousel_pic() {
+				// 切换轮播图和平铺图显示/隐藏
+				$horizontal_pic.show();
+				$carousel_pic.hide();
+			}
 		})
 	</script>
+{% endblock script %}
 
+{% block style %}
 	<style>
 		body {
 			background-color: #d4d5df;
@@ -89,6 +192,7 @@
 
 		.title-div {
 			padding-bottom: 7px;
+			padding-left: 4px;
 		}
 
 		.img-width100 {
@@ -101,11 +205,16 @@
 			margin-right: -12px;
 		}
 
-		.album-footer {
+		.album-footer,
+		.album-reviews {
 			border-top: 1px solid gray;
 			padding-left: 0px;
 			padding-right: 0px;
 			background-color: #ffffff;
+		}
+
+		.album-reviews {
+			padding-bottom: 15px;
 		}
 
 		.cell {
@@ -198,17 +307,40 @@
 			text-decoration: none;
 			/* 指正在点的链接*/
 		}
+
+
+
+		.qqFace {
+			margin-top: 4px;
+			background: #fff;
+			padding: 2px;
+			border: 1px #dfe6f6 solid;
+		}
+
+		.qqFace table td {
+			padding: 0px;
+		}
+
+		.qqFace table td img {
+			cursor: pointer;
+			border: 1px #fff solid;
+		}
+
+		.qqFace table td img:hover {
+			border: 1px #0066cc solid;
+		}
 	</style>
+{% endblock style %}
 
-</head>
+{% block title %}ALBUM INFO{% endblock title %}
 
-<body>
+{% block body %}
 	<div class="container">
-		<div class="row">
+		<div class="row" style="padding-top: 15px;padding-bottom: 15px;">
 			<div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 one-album">
 
 				<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-					<img src="./1.jpg" alt="image" class="img-circle">
+					<img src="{% static 'base/tmp/1.jpg' %}" alt="image" class="img-circle">
 				</div>
 				<div class="col-md-10 col-sm-10 col-xs-9 title-div">
 					<p class="username">将军金甲夜不脱</p>
@@ -217,65 +349,56 @@
 						【保尔柯察金感悟】我认为人应该这样活着，当你回首往事，不因碌碌无为而悔恨，也不因一事无成而懊恼，你可以骄傲的对自己说，我吧一切都献给了伟大的共产主义。
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-xs-offset-2 col-sm-offset-2">
-						<div class="level">
+				<div class="horizontal-pic">
+					<div class="row">
+						<div class="col-xs-offset-2 col-sm-offset-2">
 							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded-image">
-								<!-- <img src="./2.jpg" alt="image" class="img-rounded"> -->
-								<img src="./2.jpg" alt="image" class="img-width100">
+								<img src="{% static 'base/tmp/2.jpg' %}" alt="image" class="img-width100">
 							</div>
 							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded-image">
-								<!-- <img src="./3.jpg" alt="image" class="img-rounded"> -->
-								<img src="./3.jpg" alt="image" class="img-width100">
+								<img src="{% static 'base/tmp/3.jpg' %}" alt="image" class="img-width100">
 							</div>
 							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded-image">
-								<!-- <img src="./4.jpg" alt="image" class="img-rounded"> -->
-								<img src="./4.jpg" alt="image" class="img-width100">
+								<img src="{% static 'base/tmp/4.jpg' %}" alt="image" class="img-width100">
 							</div>
 							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded-image">
-								<!-- <img src="./5.jpg" alt="image" class="img-rounded"> -->
-								<img src="./5.jpg" alt="image" class="img-width100">
+								<img src="{% static 'base/tmp/5.jpg' %}" alt="image" class="img-width100">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-offset-2 col-sm-offset-2">
+							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded-image">
+								<img src="{% static 'base/tmp/2.jpg' %}" alt="image" class="img-width100">
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-xs-offset-2 col-sm-offset-2">
-						<div class="level">
-							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded-image">
-								<!-- <img src="./2.jpg" alt="image" class="img-rounded"> -->
-								<img src="./2.jpg" alt="image" class="img-width100">
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row" style="margin-top:10px;display:none;">
+				<div class="row carousel-pic" style="margin-top:10px;display:none;">
 					<div class="col-xs-offset-3 col-sm-offset-2">
-						<div class="col-xs-8 carousel-level">
+						<div class="col-xs-8">
+							<div class="close-carousel">
+								<a href="javascript:">
+									<span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span> 收起</a>
+							</div>
 							<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
-								<!-- Indicators -->
-								<!-- <ol class="carousel-indicators">
-									<li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
-									<li data-target="#carousel-example-generic" data-slide-to="1"></li>
-									<li data-target="#carousel-example-generic" data-slide-to="2"></li>
-								</ol> -->
 
 								<!-- Wrapper for slides -->
 								<div class="carousel-inner" role="listbox">
 									<div class="item active">
-										<img src="./4.jpg" alt="..." class="img-width100">
+										<img src="{% static 'base/tmp/4.jpg' %}" alt="..." class="img-width100">
 										<div class="carousel-caption">
 											this 111
 										</div>
 									</div>
 									<div class="item">
-										<img src="./2.jpg" alt="..." class="img-width100">
+										<img src="{% static 'base/tmp/2.jpg' %}" alt="..." class="img-width100">
 										<div class="carousel-caption">
 											this 222
 										</div>
 									</div>
 									<div class="item">
-										<img src="./3.jpg" alt="..." class="img-width100">
+										<img src="{% static 'base/tmp/3.jpg' %}" alt="..." class="img-width100">
 										<div class="carousel-caption">
 											this 3
 										</div>
@@ -293,13 +416,13 @@
 								</a>
 
 								<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 img-div">
-									<img src="./4.jpg" alt="" class="img-width100" data-target="#carousel-example-generic" data-slide-to="0">
+									<img src="{% static 'base/tmp/4.jpg' %}" alt="" class="img-width100" data-target="#carousel-example-generic" data-slide-to="0">
 								</div>
 								<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 img-div">
-									<img src="./2.jpg" alt="" class="img-width100" data-target="#carousel-example-generic" data-slide-to="1">
+									<img src="{% static 'base/tmp/2.jpg' %}" alt="" class="img-width100" data-target="#carousel-example-generic" data-slide-to="1">
 								</div>
 								<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 img-div">
-									<img src="./3.jpg" alt="" class="img-width100" data-target="#carousel-example-generic" data-slide-to="2">
+									<img src="{% static 'base/tmp/3.jpg' %}" alt="" class="img-width100" data-target="#carousel-example-generic" data-slide-to="2">
 								</div>
 							</div>
 						</div>
@@ -310,7 +433,6 @@
 			</div>
 			<div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 album-footer">
 				<div class="cell">
-					<!-- <a href="javascript:">收藏（13）</a> -->
 					<a href="javascript:">
 						<span title="点击喜欢" style="color:rgb(232, 94, 146);" class="glyphicon glyphicon-heart heart initialism" aria-hidden="true">
 						</span>
@@ -326,18 +448,18 @@
 
 			<div style="height:16px;" class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12"></div>
 
-			<div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 album-footer">
+			<div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 album-reviews">
 				<div class="b_main2">
 					<div class="border2">
 						<div class="post-review">
 							<div class="col-xs-1" style="padding-right:0px;padding-bottom:15px;">
-								<!-- <div class="col-xs-12 col-cs-offset-0"> -->
-								<img src="./2.jpg" alt="" class="review-head-proto">
-								<!-- </div> -->
+								<img src="{% static 'base/tmp/2.jpg' %}" alt="" class="review-head-proto">
 							</div>
 
-							<form action="/picture/review/info/" method="POST">
+							<form action="{% url 'picture:reply_info' 1 %}" method="POST">
 								<div class="col-xs-11" style="padding-left:5px;">
+									<input type="hidden" value="1" name="album_id">
+									<input type="hidden" value="0" name="parent_reply">
 									<textarea type="text" class="form-control pull-left" rows="1" id="description" name="description"></textarea>
 
 									<button type="button" class="btn btn-default emotion" style="margin-top:5px;">
@@ -352,19 +474,16 @@
 								<div class="border"></div>
 							</div>
 							<div class="col-xs-1" style="padding-right:0px;">
-								<!-- <div class="col-xs-12 col-cs-offset-0"> -->
-								<img src="./2.jpg" alt="" class="review-head-proto">
-								<!-- </div> -->
+								<img src="{% static 'base/tmp/2.jpg' %}" alt="" class="review-head-proto">
 							</div>
-							<div class="col-xs-11" style="padding-left:5px;">
+							<div class="col-xs-11" style="padding-left:5px;" id="9-reply">
 								<div class="review">
-									<!-- <span style="color: orange">今朝有酒今朝醉：</span>这个是真的皮哦 -->
-									<a href="#" style="color: orange">今朝有酒今朝醉：</a>这个是真的皮哦
+									<a href="javascript:" style="color: orange">今朝有酒今朝醉：</a>这个是真的皮哦
 								</div>
 								<div class="review">
 									<span class="review-createtime">52 分钟之前</span>
 									<span class="review-other">
-										<a href="#">回复</a> | 赞</span>
+										<a href="javascript:" class="second-reply-review">回复</a> | 赞</span>
 								</div>
 							</div>
 						</div>
@@ -373,36 +492,35 @@
 								<div class="border"></div>
 							</div>
 							<div class="col-xs-1" style="padding-right:0px;">
-								<!-- <div class="col-xs-12 col-cs-offset-0"> -->
-								<img src="./2.jpg" alt="" class="review-head-proto">
-								<!-- </div> -->
+								<img src="{% static 'base/tmp/2.jpg' %}" alt="" class="review-head-proto">
 							</div>
-							<div class="col-xs-11" style="padding-left:5px;">
+							<div class="col-xs-11" style="padding-left:5px;" id="1-reply">
 								<div class="review">
-									<!-- <span style="color: orange">今朝有酒今朝醉：</span>这个是真的皮哦 -->
-									<a href="#" style="color: orange">今朝有酒今朝醉：</a>这个是真的皮哦
+									<a href="javascript:" style="color: orange">今朝有酒今朝醉：</a>这个是真的皮哦
 								</div>
 								<div class="review">
 									<span class="review-createtime">52 分钟之前</span>
 									<span class="review-other">
-										<a href="#">回复</a> | 赞</span>
+										<a href="javascript:" class="second-reply-review">回复</a> | 赞</span>
 								</div>
 							</div>
 							<div class="col-xs-11 col-xs-offset-1" style="padding-left:5px;">
-								<div class="second-review-inner">
+								<div class="second-review-inner" id="2-reply">
 									<div class="review">
-										<!-- <span style="color: orange">今朝有酒今朝醉：</span>这个是真的皮哦 -->
-										<a href="#" style="color: orange">今朝有酒今朝醉：</a>这个是真的皮哦
+										<a href="javascript:" style="color: orange">今朝有酒今朝醉：</a>这个是真的皮哦
 									</div>
 									<div class="review">
 										<span class="review-createtime">50 分钟之前</span>
 										<span class="review-other">
-											<a href="#">回复</a> | 赞</span>
+											<a href="javascript:" class="third-reply-reply">回复</a> | 赞</span>
 									</div>
 								</div>
 							</div>
-						</div>
 
+
+
+						</div>
+						<div style="height:10px;"></div>
 					</div>
 					<div class="out2">
 						<div class="in2"></div>
@@ -411,8 +529,4 @@
 			</div>
 		</div>
 	</div>
-
-	</div>
-</body>
-
-</html>
+{% endblock body %}

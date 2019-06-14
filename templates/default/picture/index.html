@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-{% load static %}
 {% load datetime_filters %}
 
 {% block script %}
@@ -69,24 +68,8 @@
     <div class="container-fluid" style="padding-left:23px;padding-right:23px;background-color:#f0f2f1;padding-top:10px;">
 
         <div class="row">
-            <!--<div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">-->
-                <!--<div class="thumbnail">-->
-                    <!--<a href="http://baidu.com"><img src="{% static 'base/bg_groups/school_flower.jpg' %}" alt="..."></a>-->
-                    <!--<div class="caption">-->
-                        <!--<a href="http://baidu.com/s?wd=穷怎么办" class="text-danger" style="font-size:16px;">校花图</a>-->
-                        <!--<p class="text-muted" style="margin-top:5px;margin-bottom:5px;">15 分钟之前</p>-->
-                        <!--<p>这是我最近的照片，作为一个地球人我认为保护冥王星不受太阳辐射带来的危害使我们的责任和义务。</p>-->
-                    <!--</div>-->
-                    <!--<div style="background-color:#e2e6e4;margin-left:-4px;margin-right:-4px;margin-bottom:-4px;text-indent:6px;line-height:34px;">-->
-                        <!--<a href="#"><span title="点击收藏" class="glyphicon glyphicon-heart heart initialism" aria-hidden="true"></a>-->
-                        <!--<span class="heart_span">1301</span>-->
-                        <!--<a href="#"> <span class="glyphicon glyphicon-comment reply" aria-hidden="true"></a>-->
-                        <!--<span class="heart_span">57</span>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
-            {% for value in values %}
 
+            {% for value in values %}
             <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
                 <div class="thumbnail">
                     <a href="{% url 'picture:album_info' value.id %}"><img src="{{ value.first_picture }}" alt="..."></a>
