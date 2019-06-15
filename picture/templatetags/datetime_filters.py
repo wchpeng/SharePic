@@ -42,6 +42,7 @@ def replace_em(s):
     import re
     s = s.replace("<", '&lt;')
     s = s.replace(">", '&gt;')
-    s = s.replace("\n", '<br/>')
+    # s = s.replace("\n", '<br/>')
+    # s = s.replace("\n", '')
     s = re.sub(r'\[em_([0-9]*)\]', '<img src="{% static \'base/emoji/arclist\' %}/\g<1>.gif" border="0" />', s)
     return s
