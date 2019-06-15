@@ -117,7 +117,7 @@ jQuery.fn.extend({
 			textObj.focus();
 			var len = textFeildValue.length;
 			textObj.setSelectionRange(rangeStart + len, rangeStart + len);
-			textObj.blur();
+//			textObj.blur();
 		} else {
 			textObj.value += textFeildValue;
 		}

@@ -6,8 +6,8 @@ from SharePic.settings import *  # NOQA
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        # 'LOCATION': 'redis://127.0.0.1:6379/11',
-        'LOCATION': 'redis://172.16.15.203:6379/11',
+        'LOCATION': 'redis://127.0.0.1:6379/11',
+        # 'LOCATION': 'redis://172.16.15.203:6379/11',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             # 'PASSWORD': 'my secret',
@@ -33,8 +33,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # celery configure
-CELERY_BROKER_URL = 'redis://172.16.15.203/12'
-CELERY_RESULT_BACKEND = 'redis://172.16.15.203/12'
+# CELERY_BROKER_URL = 'redis://172.16.15.203/12'
+# CELERY_RESULT_BACKEND = 'redis://172.16.15.203/12'
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/12'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/12'
 
 LOGGING = {
     'version': 1,
