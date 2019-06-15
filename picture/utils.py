@@ -2,7 +2,7 @@ from django.core.cache import cache
 from django.conf import settings
 
 from user.models import User
-from .models import FavoriteAlbum, Reply, Picture, get_field_info_id_map
+from .models import FavoriteAlbum, Reply, Picture, get_field_username_id_map
 from .tasks import (
     update_count,
     celery_update_favorite_album_count,
@@ -18,7 +18,7 @@ def extend_albums_count(data, uid):
 
     # 扩展 album 创建者用户名
     user_ids = list(set([d["creater_id"] for d in data]))
-    user_id_name_map = get_field_info_id_map(User, user_ids, "username")
+    user_id_name_map = get_field_username_id_map(User, user_ids, "username")
 
     # 扩展 album 第一张图片 url
     first_picture_ids = list(set([d["first_picture_id"] for d in data]))

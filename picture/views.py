@@ -1,3 +1,5 @@
+import time
+
 from django.shortcuts import render
 from django.views.generic.base import TemplateView, View
 from django.core.paginator import Paginator
@@ -57,7 +59,7 @@ class AlbumInfoView(LoginRequiredMixin, View):
 
         di = album_info.to_dict(("id", "title", "desc", "creater_id", "create_time"))
         extend_album_info(di, request.user.id)
-        return JsonResponse(di)
+        # return JsonResponse(di)
         return render(request, 'picture/get_album_info.html', di)
 
     def put(self, request, album_id, *args, **kwargs):
@@ -91,6 +93,7 @@ class ReplyAddInfoView(LoginRequiredMixin, View):
     login_url = reverse('user:user_login')
 
     def post(self, request, *args, **kwargs):
+        return JsonResponse({"code": 0, "msg": "成功", "data": {"id": int(time.time()) % 864000}})
         return JsonResponse({"code": 0, "msg": "成功", "data": "暂未开发"})
 
 

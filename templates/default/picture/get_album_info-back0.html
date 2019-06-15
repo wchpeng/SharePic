@@ -18,8 +18,6 @@
 			var $close_carousel = $(".close-carousel");
 			var $second_reply_review = $(".second-reply-review");
 			var $third_reply_reply = $(".third-reply-reply");
-			$.cookie("username", "{{ request.user.username }}");
-			$.cookie("picture", "{{ request.user.picture.url }}");
 
 			$("#description").focus(function () {
 				$('textarea').each(function () {
@@ -47,130 +45,9 @@
 
 			$rounded_image.click(hide_horizontal_pic);
 			$close_carousel.click(hide_carousel_pic);
-			$(".border2").on("click", ".second-reply-review", toggle_second_reply_review_form);
-			$(".border2").on("click", ".third-reply-reply", toggle_third_reply_reply_form);
-			$(".border2").on("submit", ".reply-form", reply_form_submit);
-			$(".border2").on("submit", ".second-reply-form", second_reply_form_submit);
-			$(".border2").on("submit", ".third-reply-form", third_reply_form_submit);
+			$second_reply_review.click(toggle_second_reply_review_form);
+			$third_reply_reply.click(toggle_third_reply_reply_form);
 
-
-			function reply_form_submit(){
-				// 第一个回复评论按钮不生效使用 json 请求，插入一级回复
-				var cur = $(this);
-				var csrfmiddlewaretoken = $(this).find($("input[name='csrfmiddlewaretoken']")).val();
-				var album_id = $(this).find($("input[name='album_id']")).val();
-				var parent_reply = $(this).find($("input[name='parent_reply']")).val();
-				var content = $(this).find($("textarea[name='content']")).val();
-				if (content.trim().length == 0){
-					alert("内容不能为空！")
-					cur.find("textarea").val("");
-					return false
-				}
-				console.log({csrfmiddlewaretoken:csrfmiddlewaretoken,album_id:album_id,parent_reply:parent_reply,content:content});
-
-				$.ajax({
-                    url: "{% url 'picture:post_reply_info' %}",
-                    data: {csrfmiddlewaretoken:csrfmiddlewaretoken,album_id:album_id,parent_reply:parent_reply,content:content},
-                    type: 'POST',
-                    success: function(data, status, xhr){
-                        if (data.code == 0) {
-                            $("#reviews-count").text(parseInt($("#reviews-count").text())+1);
-                            cur.parent().after('<div class="one-review">\
-								<div class="review-border col-xs-12">\
-									<div class="border"></div>\
-								</div>\
-								<div class="col-xs-1" style="padding-right:0px;">\
-									<img src="' + $.cookie("picture") + '" alt="" class="review-head-proto">\
-								</div>\
-								<div class="col-xs-11" style="padding-left:5px;" id="' + data.data.id + '-reply">\
-									<div class="review">\
-										<a href="javascript:" style="color: orange">' + $.cookie("username") +'：</a>'+ replace_em(content) +'</div>\
-									<div class="review">\
-										<span class="review-createtime">刚刚</span>\
-										<span class="review-other">\
-											<a href="javascript:" class="second-reply-review">回复</a> | 赞</span>\
-									</div>\
-								</div>\
-							</div>')
-							cur.find("textarea").val("");
-                        } else {
-                        	alert(data.msg);
-                        }
-                    }
-                })
-				return false
-			}
-			 function second_reply_form_submit(){
-				// 第一个回复评论按钮不生效使用 json 请求，插入一级回复
-				var cur = $(this);
-				var csrfmiddlewaretoken = $(this).find($("input[name='csrfmiddlewaretoken']")).val();
-				var album_id = $(this).find($("input[name='album_id']")).val();
-				var parent_reply = $(this).find($("input[name='parent_reply']")).val();
-				var content = $(this).find($("textarea[name='content']")).val();
-				console.log({csrfmiddlewaretoken:csrfmiddlewaretoken,album_id:album_id,parent_reply:parent_reply,content:content});
-				$.ajax({
-                    url: "{% url 'picture:post_reply_info' %}",
-                    data: {csrfmiddlewaretoken:csrfmiddlewaretoken,album_id:album_id,parent_reply:parent_reply,content:content},
-                    type: 'POST',
-                    success: function(data, status, xhr){
-                        if (data.code == 0) {
-                            $("#reviews-count").text(parseInt($("#reviews-count").text())+1);
-                            cur.after('<div class="col-xs-11 col-xs-offset-1" style="padding-left:5px;padding-bottom:5px;">\
-								<div class="second-review-inner" id="' + data.data.id + '-reply">\
-									<div class="review">\
-										<a href="javascript:" style="color: orange">' + $.cookie("username") +'：</a>'+ replace_em(content) +'</div>\
-									<div class="review">\
-										<span class="review-createtime">刚刚</span>\
-										<span class="review-other">\
-											<a href="javascript:" class="third-reply-reply">回复</a> | 赞</span>\
-									</div>\
-								</div>\
-							</div>')
-							cur.remove()
-                        } else {
-                        	alert(data.msg);
-                        }
-                    }
-                })
-
-				return false
-			}
-			function third_reply_form_submit(){
-				// 第一个回复评论按钮不生效使用 json 请求，插入二级回复
-				var cur = $(this);
-				var csrfmiddlewaretoken = $(this).find($("input[name='csrfmiddlewaretoken']")).val();
-				var album_id = $(this).find($("input[name='album_id']")).val();
-				var parent_reply = $(this).find($("input[name='parent_reply']")).val();
-				var content = $(this).parent().find($("textarea[name='content']")).val();
-				console.log({csrfmiddlewaretoken:csrfmiddlewaretoken,album_id:album_id,parent_reply:parent_reply,content:content});
-				$.ajax({
-                    url: "{% url 'picture:post_reply_info' %}",
-                    data: {csrfmiddlewaretoken:csrfmiddlewaretoken,album_id:album_id,parent_reply:parent_reply,content:content},
-                    type: 'POST',
-                    success: function(data, status, xhr){
-                        if (data.code == 0) {
-                            $("#reviews-count").text(parseInt($("#reviews-count").text())+1);
-                            s = '<div class="col-xs-11 col-xs-offset-1" style="padding-left:5px;padding-bottom:5px;">\
-								<div class="second-review-inner" id="' + data.data.id + '-reply">\
-									<div class="review">\
-										<a href="javascript:" style="color: orange">' + $.cookie("username") +'：</a>'+ replace_em(content) +'</div>\
-									<div class="review">\
-										<span class="review-createtime">刚刚</span>\
-										<span class="review-other">\
-											<a href="javascript:" class="third-reply-reply">回复</a> | 赞</span>\
-									</div>\
-								</div>\
-							</div>'
-							cur.parent().parent().children("div:eq(2)").after(s);
-							cur.remove()
-                        } else {
-                        	alert(data.msg);
-                        }
-                    }
-                })
-
-				return false
-			}
 			function toggle_second_reply_review_form() {
 				// 切换或隐藏一级回复的回复‘评论框’
 				cur = $(this);
@@ -182,12 +59,11 @@
 					$("#" + form_id).remove();
 				} else {
 					ppp_review.after(
-						'<form action="{% url 'picture:post_reply_info' %}" method="POST" id="' + form_id + '" class="second-reply-form">\
+						'<form action="{% url 'picture:post_reply_info' %}" method="POST" id="' + form_id + '">\
 						<div class="col-xs-11 col-xs-offset-1" style="padding-left:5px;padding-top: 10px;padding-bottom: 10px; padding-bottom:6px;"> \
-							{% csrf_token %}\
 							<input type="hidden" value="1" name="album_id">\
-							<input type="hidden" value="' + parseInt(form_id) + '" name="parent_reply">\
-							<textarea type="text" class="form-control pull-left" rows="1" id="description' + form_id + '" name="content"></textarea>\
+							<input type="hidden" value="0" name="parent_reply">\
+							<textarea type="text" class="form-control pull-left" rows="1" id="description' + form_id + '" name="description">@' + reply_username + '</textarea>\
 							<button type="button" class="btn btn-default emotion' + form_id + '" style="margin-top:5px;">\
 								<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>\
 							</button>\
@@ -224,17 +100,17 @@
 				var form_id = ppp_review.attr("id") + '-form';
 				var parent_review_id = ppp_review.parent().siblings().slice(2).attr("id");
 				var reply_username = cur.parent().parent().prev().children().text();
+				console.log(reply_username);
 
 				if ($("#" + form_id).length > 0) {
 					$("#" + form_id).remove();
 				} else {
 					ppp_review.after(
-						'<form action="{% url 'picture:post_reply_info' %}" method="POST" id="' + form_id + '" class="third-reply-form">\
+						'<form action="{% url 'picture:post_reply_info' %}" method="POST" id="' + form_id + '">\
 							<div class="col-xs-12" style="padding-left:5px;padding-top: 10px;background-color: #ddd; padding-bottom:6px;"> \
-								{% csrf_token %}\
 								<input type="hidden" value="1" name="album_id">\
 								<input type="hidden" value="'+ parseInt(parent_review_id) + '" name="parent_reply">\
-								<textarea type="text" class="form-control pull-left" rows="1" id="description' + form_id + '" name="content">@' + reply_username + '</textarea>\
+								<textarea type="text" class="form-control pull-left" rows="1" id="description' + form_id + '" name="description">@' + reply_username + '</textarea>\
 								<button type="button" class="btn btn-default emotion' + form_id + '" style="margin-top:5px;">\
 									<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>\
 								</button>\
@@ -264,14 +140,11 @@
 			}
 
             $("#{{ id }}-favorite").click(function(){
-                // 点击收藏切换
-                ajax_send_for_operate_album("{% url 'picture:get_favorite_album' %}", "{{ id }}-favorite", "收藏")
+                // 点击收藏切换图标颜色
+                ajax_send_for_operate_album("{% url 'picture:get_favorite_album' %}", "{{ id }}", "收藏")
             });
             $("#{{ id }}-like").click(function(){
-                ajax_send_for_operate_album("{% url 'picture:get_favorite_album' %}", "{{ id }}-like", "点赞")
-            })
-            $("#{{ id }}-replies").click(function(){
-            	$(".album-reviews").toggle();
+                ajax_send_for_operate_album("{% url 'picture:get_favorite_album' %}", "{{ id }}", "点赞")
             })
 
 			var ajax_send_for_operate_album = function(url, id, base_msg){
@@ -289,7 +162,7 @@
 			}
 
 			var toggle_heart_color = function(id, base_msg) {
-				// 切换收藏图标颜色
+				// 切换收藏图标
                 $current = $("#" + id);
                 var $heart_n_span = $current.next();
                 var heart_count = parseInt($heart_n_span.text());
@@ -522,33 +395,35 @@
 				</div>
 				<div class="col-md-10 col-sm-10 col-xs-9 title-div">
 					<p class="username">{{ creater__username }}</p>
-					<p class="create_time">{{ create_time|datetime_semantization }}</p>
+					<p class="create_time">发表于 20 分钟前</p>
 					<div>
-						【{{ title|replace_em }}】{{ desc|replace_em }}
+						【{{ title }}】{{ desc }}
 					</div>
 				</div>
 				<div class="horizontal-pic">
 					<div class="row">
 						<div class="col-xs-offset-2 col-sm-offset-2">
-						{% for picture in pictures|slice:":4" %}
 							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded-image">
-								<img src="{{ picture.picture }}" alt="image" class="img-width100">
+								<img src="{% static 'base/tmp/2.jpg' %}" alt="image" class="img-width100">
 							</div>
-						{% endfor %}
+							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded-image">
+								<img src="{% static 'base/tmp/3.jpg' %}" alt="image" class="img-width100">
+							</div>
+							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded-image">
+								<img src="{% static 'base/tmp/4.jpg' %}" alt="image" class="img-width100">
+							</div>
+							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded-image">
+								<img src="{% static 'base/tmp/5.jpg' %}" alt="image" class="img-width100">
+							</div>
 						</div>
 					</div>
-					{% if pictures|length > 4 %}
 					<div class="row">
 						<div class="col-xs-offset-2 col-sm-offset-2">
-							{% for picture in pictures|slice:"4:" %}
 							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded-image">
-								<img src="{{ picture.picture }}" alt="image" class="img-width100">
+								<img src="{% static 'base/tmp/2.jpg' %}" alt="image" class="img-width100">
 							</div>
-							{% endfor %}
 						</div>
 					</div>
-					{% endif %}
-
 				</div>
 				<div class="row carousel-pic" style="margin-top:10px;display:none;">
 					<div class="col-xs-offset-3 col-sm-offset-2">
@@ -560,14 +435,24 @@
 							<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
 								<!-- Wrapper for slides -->
 								<div class="carousel-inner" role="listbox">
-									{% for p in pictures %}
 									<div class="item active">
-										<img src="{{ p.picture }}" alt="..." class="img-width100">
-										<!--<div class="carousel-caption">-->
-											<!--this 111-->
-										<!--</div>-->
+										<img src="{% static 'base/tmp/4.jpg' %}" alt="..." class="img-width100">
+										<div class="carousel-caption">
+											this 111
+										</div>
 									</div>
-									{% endfor %}
+									<div class="item">
+										<img src="{% static 'base/tmp/2.jpg' %}" alt="..." class="img-width100">
+										<div class="carousel-caption">
+											this 222
+										</div>
+									</div>
+									<div class="item">
+										<img src="{% static 'base/tmp/3.jpg' %}" alt="..." class="img-width100">
+										<div class="carousel-caption">
+											this 3
+										</div>
+									</div>
 								</div>
 
 								<!-- Controls -->
@@ -580,12 +465,15 @@
 									<span class="sr-only">Next</span>
 								</a>
 
-								{% for p in pictures %}
 								<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 img-div">
-									<img src="{{ p.picture }}" alt="" class="img-width100" data-target="#carousel-example-generic" data-slide-to="0">
+									<img src="{% static 'base/tmp/4.jpg' %}" alt="" class="img-width100" data-target="#carousel-example-generic" data-slide-to="0">
 								</div>
-								{% endfor %}
-
+								<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 img-div">
+									<img src="{% static 'base/tmp/2.jpg' %}" alt="" class="img-width100" data-target="#carousel-example-generic" data-slide-to="1">
+								</div>
+								<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 img-div">
+									<img src="{% static 'base/tmp/3.jpg' %}" alt="" class="img-width100" data-target="#carousel-example-generic" data-slide-to="2">
+								</div>
 							</div>
 						</div>
 					</div>
@@ -601,10 +489,10 @@
 					<!--</a>-->
 				<!--</div>-->
 				<div class="cell">
-					<a href="javascript:" id="{{ id }}-favorite">{% if is_favorite %}已{% endif %}收藏</a>（<span>{{ favorite_count }}</span>）
+					<a href="javascript:" id="{{ id }}-favorite">收藏</a>（<span>56</span>）
 				</div>
 				<div class="cell" style="border-left:1px dashed gray;">
-					<a href="javascript:" id="{{ id }}-replies">评论</a>（<span id="reviews-count">{{ reply_count }}</span>）
+					<a href="javascript:">评论</a>（<span>56</span>）
 				</div>
 				<div class="cell" style="border-left:1px dashed gray;">
 					<a href="javascript:" id="{{ id }}-like">点赞</a>（<span>99</span>）
@@ -618,15 +506,14 @@
 					<div class="border2">
 						<div class="post-review">
 							<div class="col-xs-1" style="padding-right:0px;padding-bottom:15px;">
-								<img src="{{ request.user.picture.url }}" alt="" class="review-head-proto">
+								<img src="{% static 'base/tmp/2.jpg' %}" alt="" class="review-head-proto">
 							</div>
 
-							<form action="{% url 'picture:post_reply_info' %}" method="POST" class="reply-form">
+							<form action="{% url 'picture:post_reply_info' %}" method="POST">
 								<div class="col-xs-11" style="padding-left:5px;">
-									{% csrf_token %}
 									<input type="hidden" value="1" name="album_id">
 									<input type="hidden" value="0" name="parent_reply">
-									<textarea type="text" class="form-control pull-left" rows="1" id="description" name="content"></textarea>
+									<textarea type="text" class="form-control pull-left" rows="1" id="description" name="description"></textarea>
 
 									<button type="button" class="btn btn-default emotion" style="margin-top:5px;">
 										<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>
@@ -635,46 +522,61 @@
 								</div>
 							</form>
 						</div>
-
-						{% for review in reviews %}
 						<div class="one-review">
 							<div class="review-border col-xs-12">
 								<div class="border"></div>
 							</div>
 							<div class="col-xs-1" style="padding-right:0px;">
 								<!-- <div class="col-xs-12 col-cs-offset-0"> -->
-								<img src="{{ review.creater__picture }}" alt="" class="review-head-proto">
+								<img src="{% static 'base/tmp/2.jpg' %}" alt="" class="review-head-proto">
 								<!-- </div> -->
 							</div>
-							<div class="col-xs-11" style="padding-left:5px;" id="{{ review.id }}-reply">
+							<div class="col-xs-11" style="padding-left:5px;" id="9-reply">
 								<div class="review">
 									<!-- <span style="color: orange">今朝有酒今朝醉：</span>这个是真的皮哦 -->
-									<a href="javascript:" style="color: orange">{{ review.creater__username|replace_em }}：</a>{{ review.content|replace_em }}
+									<a href="javascript:" style="color: orange">今朝有酒今朝醉：</a>这个是真的皮哦
 								</div>
 								<div class="review">
-									<span class="review-createtime">{{ review.create_time|datetime_semantization }}</span>
+									<span class="review-createtime">52 分钟之前</span>
 									<span class="review-other">
 										<a href="javascript:" class="second-reply-review">回复</a> | 赞</span>
 								</div>
 							</div>
-							{% for reply in review.replies %}
+						</div>
+						<div class="one-review">
+							<div class="review-border col-xs-12">
+								<div class="border"></div>
+							</div>
+							<div class="col-xs-1" style="padding-right:0px;">
+								<img src="{% static 'base/tmp/2.jpg' %}" alt="" class="review-head-proto">
+								<!-- </div> -->
+							</div>
+							<div class="col-xs-11" style="padding-left:5px;" id="1-reply">
+								<div class="review">
+									<a href="javascript:" style="color: orange">今朝有酒今朝醉：</a>这个是真的皮哦
+								</div>
+								<div class="review">
+									<span class="review-createtime">52 分钟之前</span>
+									<span class="review-other">
+										<a href="javascript:" class="second-reply-review">回复</a> | 赞</span>
+								</div>
+							</div>
+
 							<div class="col-xs-11 col-xs-offset-1" style="padding-left:5px;padding-bottom:5px;">
-								<div class="second-review-inner" id="{{ reply.id }}-reply">
+								<div class="second-review-inner" id="2-reply">
 									<div class="review">
 										<!-- <span style="color: orange">今朝有酒今朝醉：</span>这个是真的皮哦 -->
-										<a href="javascript:" style="color: orange">{{ reply.creater__username|replace_em }}：</a>{{ reply.content|replace_em }}
+										<a href="javascript:" style="color: orange">今朝有酒今朝醉：</a>这个是真的皮哦
 									</div>
 									<div class="review">
-										<span class="review-createtime">{{ reply.create_time|datetime_semantization }}</span>
+										<span class="review-createtime">50 分钟之前</span>
 										<span class="review-other">
 											<a href="javascript:" class="third-reply-reply">回复</a> | 赞</span>
 									</div>
 								</div>
-							</div>
-							{% endfor %}
-						</div>
-						{% endfor %}
 
+							</div>
+						</div>
 						<div style="height:10px;"></div>
 					</div>
 					<div class="out2">

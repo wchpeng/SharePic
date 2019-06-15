@@ -2,11 +2,12 @@ from itertools import chain
 from collections import defaultdict, OrderedDict
 
 from django.db import models
-from django.core.cache import cache
 from django.conf import settings
 
 from user.models import User
 from SharePic.utils import cache_value
+
+DEFAULT_USER_PICTURE = "/media/user/pictures/default.jpg"
 
 
 class Picture(models.Model):
@@ -54,6 +55,14 @@ class Album(models.Model):
             data[f.name] = f.value_from_object(self)
 
         if ext:
+            try:
+                user = User.objects.get(id=self.creater_id)
+                data["creater__username"] = user.username
+                data["creater__picture"] = user.picture.url
+            except User.DoseNotExist:
+                data["creater__username"] = ""
+                data["creater__picture"] = DEFAULT_USER_PICTURE
+
             data["reviews"] = self.get_reviews()
             data["pictures"] = self.get_pictures()
 
@@ -124,13 +133,14 @@ class FavoriteAlbum(models.Model):
         verbose_name_plural = "点赞"
 
 
-def get_field_info_id_map(kclass, ids, field):
+def get_field_username_id_map(kclass, ids, field):
     usernames = kclass.objects.filter(id__in=ids).values("id", field)
     return {u["id"]: u[field] for u in usernames}
 
 
-def get_creater_username_and_picture(ids):
-    users = User.objects.filter(id__in=ids).values("id", "username", "")
+def get_field_info_id_map(kclass, ids, *field):
+    usernames = kclass.objects.filter(id__in=ids).values("id", *field)
+    return {u["id"]: u for u in usernames}
 
 
 def get_albums_reviews_info(album_id):
@@ -143,12 +153,15 @@ def get_albums_reviews_info(album_id):
         )
     )
     creater_ids = list(set([rep["creater_id"] for rep in replies]))
-    user_id_name_map = get_field_info_id_map(User, creater_ids, "username")
+    user_id_name_map = get_field_info_id_map(User, creater_ids, "username", "picture")
 
     first_replies = OrderedDict()
     second_replies = defaultdict(list)
     for rep in replies:
-        rep["creater_username"] = user_id_name_map.get(rep["creater_id"], "")
+        user_info = user_id_name_map.get(rep["creater_id"])
+        rep["creater__username"] = user_info["username"] if "username" in user_info and user_info["username"] else ""
+        rep["creater__picture"] = settings.MEDIA_URL + user_info["picture"] if "picture" in user_info and user_info["picture"] else DEFAULT_USER_PICTURE
+
         if rep["parent_reply"] == 0:
             first_replies[rep["id"]] = rep
         else:
