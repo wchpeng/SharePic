@@ -186,7 +186,7 @@
 						'<form action="{% url 'picture:post_reply_info' %}" method="POST" id="' + form_id + '" class="second-reply-form">\
 						<div class="col-xs-11 col-xs-offset-1" style="padding-left:5px;padding-top: 10px;padding-bottom: 10px; padding-bottom:6px;"> \
 							{% csrf_token %}\
-							<input type="hidden" value="1" name="album_id">\
+							<input type="hidden" value="{{ id }}" name="album_id">\
 							<input type="hidden" value="' + parseInt(form_id) + '" name="parent_reply">\
 							<textarea type="text" class="form-control pull-left" rows="1" id="description' + form_id + '" name="content"></textarea>\
 							<button type="button" class="btn btn-default emotion' + form_id + '" style="margin-top:5px;">\
@@ -233,7 +233,7 @@
 						'<form action="{% url 'picture:post_reply_info' %}" method="POST" id="' + form_id + '" class="third-reply-form">\
 							<div class="col-xs-12" style="padding-left:5px;padding-top: 10px;background-color: #ddd; padding-bottom:6px;"> \
 								{% csrf_token %}\
-								<input type="hidden" value="1" name="album_id">\
+								<input type="hidden" value="{{ id }}" name="album_id">\
 								<input type="hidden" value="'+ parseInt(parent_review_id) + '" name="parent_reply">\
 								<textarea type="text" class="form-control pull-left" rows="1" id="description' + form_id + '" name="content">@' + reply_username + '</textarea>\
 								<button type="button" class="btn btn-default emotion' + form_id + '" style="margin-top:5px;">\
@@ -269,7 +269,7 @@
                 ajax_send_for_operate_album("{% url 'picture:get_favorite_album' %}", "{{ id }}-favorite", "收藏")
             });
             $("#{{ id }}-like").click(function(){
-                ajax_send_for_operate_album("{% url 'picture:get_favorite_album' %}", "{{ id }}-like", "点赞")
+                ajax_send_for_operate_album("{% url 'picture:get_like_album' %}", "{{ id }}-like", "点赞")
             })
             $("#{{ id }}-replies").click(function(){
             	$(".album-reviews").toggle();
@@ -514,7 +514,7 @@
 
 {% block body %}
 	<div class="container">
-		<div class="row" style="padding-top: 15px;padding-bottom: 15px;">
+		<div class="row" style="padding-top: 25px;padding-bottom: 15px;">
 			<div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 one-album">
 
 				<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
@@ -524,7 +524,7 @@
 					<p class="username">{{ creater__username }}</p>
 					<p class="create_time">{{ create_time|datetime_semantization }}</p>
 					<div>
-						【{{ title|replace_em }}】{{ desc|replace_em }}
+						【{{ title|replace_em|safe }}】{{ desc|replace_em|safe }}
 					</div>
 				</div>
 				<div class="horizontal-pic">
@@ -607,7 +607,7 @@
 					<a href="javascript:" id="{{ id }}-replies">评论</a>（<span id="reviews-count">{{ reply_count }}</span>）
 				</div>
 				<div class="cell" style="border-left:1px dashed gray;">
-					<a href="javascript:" id="{{ id }}-like">点赞</a>（<span>99</span>）
+					<a href="javascript:" id="{{ id }}-like">{% if is_like %}已{% endif %}点赞</a>（<span>{{ like_count }}</span>）
 				</div>
 			</div>
 
@@ -624,7 +624,7 @@
 							<form action="{% url 'picture:post_reply_info' %}" method="POST" class="reply-form">
 								<div class="col-xs-11" style="padding-left:5px;">
 									{% csrf_token %}
-									<input type="hidden" value="1" name="album_id">
+									<input type="hidden" value="{{ id }}" name="album_id">
 									<input type="hidden" value="0" name="parent_reply">
 									<textarea type="text" class="form-control pull-left" rows="1" id="description" name="content"></textarea>
 
@@ -649,7 +649,7 @@
 							<div class="col-xs-11" style="padding-left:5px;" id="{{ review.id }}-reply">
 								<div class="review">
 									<!-- <span style="color: orange">今朝有酒今朝醉：</span>这个是真的皮哦 -->
-									<a href="javascript:" style="color: orange">{{ review.creater__username|replace_em }}：</a>{{ review.content|replace_em }}
+									<a href="javascript:" style="color: orange">{{ review.creater__username|replace_em|safe }}：</a>{{ review.content|replace_em|safe }}
 								</div>
 								<div class="review">
 									<span class="review-createtime">{{ review.create_time|datetime_semantization }}</span>
@@ -662,7 +662,7 @@
 								<div class="second-review-inner" id="{{ reply.id }}-reply">
 									<div class="review">
 										<!-- <span style="color: orange">今朝有酒今朝醉：</span>这个是真的皮哦 -->
-										<a href="javascript:" style="color: orange">{{ reply.creater__username|replace_em }}：</a>{{ reply.content|replace_em }}
+										<a href="javascript:" style="color: orange">{{ reply.creater__username|replace_em|safe }}：</a>{{ reply.content|replace_em|safe }}
 									</div>
 									<div class="review">
 										<span class="review-createtime">{{ reply.create_time|datetime_semantization }}</span>

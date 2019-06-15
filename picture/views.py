@@ -8,8 +8,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy as reverse
 from django.http import JsonResponse, Http404
 
-from .models import Picture, Album, FavoriteAlbum
-from .utils import extend_albums_count, update_favorite_album_count, extend_album_info
+from .models import Picture, Album, FavoriteAlbum, LikeAlbum
+from .utils import extend_albums_count, update_favorite_album_count, extend_album_info, update_like_album_count
+from .forms import AddReplyInfoFrom
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
@@ -93,8 +94,11 @@ class ReplyAddInfoView(LoginRequiredMixin, View):
     login_url = reverse('user:user_login')
 
     def post(self, request, *args, **kwargs):
-        return JsonResponse({"code": 0, "msg": "成功", "data": {"id": int(time.time()) % 864000}})
-        return JsonResponse({"code": 0, "msg": "成功", "data": "暂未开发"})
+        form = AddReplyInfoFrom(request.POST)
+        if form.is_valid():
+            reply_id = form.save().id
+            return JsonResponse({"code": 0, "msg": "成功", "data": {"id": reply_id}})
+        return JsonResponse({"code": 400, "msg": "验证失败", "data": form.errors})
 
 
 class FavoriteAlbumView(LoginRequiredMixin, View):
@@ -113,5 +117,25 @@ class FavoriteAlbumView(LoginRequiredMixin, View):
         else:
             obj_id = FavoriteAlbum.objects.create(album_id=album_id, creater_id=request.user.id).id
         update_favorite_album_count(album_id)
+
+        return JsonResponse({'code': 0, 'msg': '成功', 'data': {'id': obj_id}})
+
+
+class LikeAlbumView(LoginRequiredMixin, View):
+    login_url = reverse('user:user_login')
+
+    def get(self, request, *args, **kwargs):
+        # 添加、删除收藏文章
+        album_id = request.GET.get("album_id")
+        obj_id = -1
+
+        if not album_id:
+            return JsonResponse({"code": 101, 'msg': '缺少 album_id'})
+
+        if LikeAlbum.objects.filter(album_id=album_id, creater_id=request.user.id).count() > 0:
+            LikeAlbum.objects.filter(album_id=album_id, creater_id=request.user.id).delete()
+        else:
+            obj_id = LikeAlbum.objects.create(album_id=album_id, creater_id=request.user.id).id
+        update_like_album_count(album_id)
 
         return JsonResponse({'code': 0, 'msg': '成功', 'data': {'id': obj_id}})

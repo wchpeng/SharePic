@@ -122,6 +122,19 @@ class Reply(models.Model):
 
 class FavoriteAlbum(models.Model):
     album_id = models.IntegerField(verbose_name="相册id", default=0)
+    creater_id = models.IntegerField(verbose_name="收藏人id", default=0)
+    creater_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+    def __str__(self):
+        return "%d - %d" % (self.album_id, self.creater_id)
+
+    class Meta:
+        verbose_name = "收藏"
+        verbose_name_plural = "收藏"
+
+
+class LikeAlbum(models.Model):
+    album_id = models.IntegerField(verbose_name="相册id", default=0)
     creater_id = models.IntegerField(verbose_name="点赞人id", default=0)
     creater_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
 

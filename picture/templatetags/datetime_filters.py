@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.template import Library
+from django.conf import settings
 
 register = Library()
 
@@ -10,12 +11,15 @@ def datetime_semantization(dt):
     # 把传入的时间格式化显示
     secs = (datetime.now() - dt).total_seconds()
 
-    if secs < 60:
-        return "%d 秒之前" % secs
+    # if secs < 60:
+    #     return "%d 秒之前" % secs
+    if secs <= 120:
+        return "刚刚"
     elif secs <= 3600:
         return "%d 分钟之前" % (secs//60)
     elif secs <= 86400:
-        return "%d 小时 %d 分钟之前" % (secs//3600, secs % 3600//60)
+        return "%.1f 小时之前" % (secs/3600.0)
+        # return "%d 小时 %d 分钟之前" % (secs//3600, secs % 3600//60)
     else:
         return dt.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -44,5 +48,5 @@ def replace_em(s):
     s = s.replace(">", '&gt;')
     # s = s.replace("\n", '<br/>')
     # s = s.replace("\n", '')
-    s = re.sub(r'\[em_([0-9]*)\]', '<img src="{% static \'base/emoji/arclist\' %}/\g<1>.gif" border="0" />', s)
+    s = re.sub(r'\[em_([0-9]*)\]', '<img src="' + settings.STATIC_URL + 'base/emoji/arclist/\g<1>.gif" border="0" />', s)
     return s

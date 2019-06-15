@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'SharePic.middleware.GlobalRequestMiddleware',
 ]
 
 ROOT_URLCONF = 'SharePic.urls'
@@ -131,6 +132,7 @@ CELERY_RESULT_BACKEND = 'redis://127.0.0.1/12'
 # CELERY_RESULT_SERIALIZER = 'json'
 
 # cache key format
-REPLY_ALBUM_CACHE_KEY = "album:replyalbum:{}"  # 回复数
-FAVORITE_ALBUM_CACHE_KEY = "album:favoritealbum:{}"  # 收藏數
+REPLY_ALBUM_CACHE_KEY = "album:replyalbumcount:{}"  # 回复数
+FAVORITE_ALBUM_CACHE_KEY = "album:favoritealbumcount:{}"  # 收藏數
 ALBUM_REVIEWS_CACHE_KEY = "album:reviews:{}"  # 回复
+LIKE_ALBUM_CACHE_KEY = 'album:likealbumcount'

@@ -2,14 +2,16 @@ from django.core.cache import cache
 from django.conf import settings
 
 from user.models import User
-from .models import FavoriteAlbum, Reply, Picture, get_field_username_id_map
+from .models import FavoriteAlbum, Reply, Picture, get_field_username_id_map, LikeAlbum
 from .tasks import (
     update_count,
+    celery_update_like_album_count,
     celery_update_favorite_album_count,
     celery_update_reply_album_count,
 )
 
 REPLY_ALBUM_CACHE_KEY = settings.REPLY_ALBUM_CACHE_KEY
+LIKE_ALBUM_CACHE_KEY = settings.LIKE_ALBUM_CACHE_KEY
 FAVORITE_ALBUM_CACHE_KEY = settings.FAVORITE_ALBUM_CACHE_KEY
 
 
@@ -50,14 +52,19 @@ def extend_albums_count(data, uid):
         album_id = d["id"]
         d["reply_count"] = get_reply_album_count(album_id)
         d["favorite_count"] = get_favorite_album_count(album_id)
+        d["like_count"] = get_like_album_count(album_id)
         d["is_favorite"] = album_id in favorite_album_ids
 
 
 def extend_album_info(album_info, uid=None):
     album_id = album_info.get("id", -1)
     album_info["reply_count"] = get_reply_album_count(album_id)
+    album_info["like_count"] = get_like_album_count(album_id)
     album_info["favorite_count"] = get_favorite_album_count(album_id)
     album_info["is_favorite"] = FavoriteAlbum.objects.filter(
+        album_id=album_id, creater_id=uid
+    ).exists()
+    album_info["is_like"] = LikeAlbum.objects.filter(
         album_id=album_id, creater_id=uid
     ).exists()
 
@@ -72,9 +79,24 @@ def get_favorite_album_count(album_id):
     )
 
 
+def get_like_album_count(album_id):
+    # 获取相册收藏数
+    return get_count(
+        key="album_id",
+        value=album_id,
+        obj=LikeAlbum,
+        cache_key_format=LIKE_ALBUM_CACHE_KEY,
+    )
+
+
 def update_favorite_album_count(album_id):
     # 保存相册收藏数
     celery_update_favorite_album_count.delay(album_id)
+
+
+def update_like_album_count(album_id):
+    # 保存相册收藏数
+    celery_update_like_album_count.delay(album_id)
 
 
 def get_reply_album_count(album_id):

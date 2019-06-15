@@ -3,9 +3,10 @@ from celery import shared_task
 from django.core.cache import cache
 from django.conf import settings
 
-from .models import FavoriteAlbum, Reply
+from .models import FavoriteAlbum, Reply, LikeAlbum
 
 REPLY_ALBUM_CACHE_KEY = settings.REPLY_ALBUM_CACHE_KEY
+LIKE_ALBUM_CACHE_KEY = settings.LIKE_ALBUM_CACHE_KEY
 FAVORITE_ALBUM_CACHE_KEY = settings.FAVORITE_ALBUM_CACHE_KEY
 
 
@@ -13,6 +14,12 @@ FAVORITE_ALBUM_CACHE_KEY = settings.FAVORITE_ALBUM_CACHE_KEY
 def celery_update_favorite_album_count(album_id):
     # 保存相册收藏数
     update_count(key="album_id", value=album_id, obj=FavoriteAlbum, cache_key_format=FAVORITE_ALBUM_CACHE_KEY)
+
+
+@shared_task
+def celery_update_like_album_count(album_id):
+    # 保存相册收藏数
+    update_count(key="album_id", value=album_id, obj=LikeAlbum, cache_key_format=LIKE_ALBUM_CACHE_KEY)
 
 
 @shared_task

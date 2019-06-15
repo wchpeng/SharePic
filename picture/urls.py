@@ -11,4 +11,5 @@ urlpatterns = [
     path('picture/info/<int:album_id>/', views.AlbumInfoView.as_view(), name='album_info'),
     path('reply/info/<int:reply_id>/', views.ReplyInfoView.as_view(), name='reply_info'),
     path('picture/favorite_album/', views.FavoriteAlbumView.as_view(), name='get_favorite_album'),
+    path('picture/like_album/', views.LikeAlbumView.as_view(), name='get_like_album'),
 ]
