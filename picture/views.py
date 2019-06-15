@@ -57,7 +57,7 @@ class AlbumInfoView(LoginRequiredMixin, View):
 
         di = album_info.to_dict(("id", "title", "desc", "creater_id", "create_time"))
         extend_album_info(di, request.user.id)
-
+        return JsonResponse(di)
         return render(request, 'picture/get_album_info.html', di)
 
     def put(self, request, album_id, *args, **kwargs):

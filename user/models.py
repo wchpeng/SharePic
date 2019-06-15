@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     # 用户表，可扩展字段
-
+    picture = models.ImageField(upload_to='user/pictures', default='user/pictures/default.jpg', verbose_name='头像')
     pass
 
 

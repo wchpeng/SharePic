@@ -129,6 +129,10 @@ def get_field_info_id_map(kclass, ids, field):
     return {u["id"]: u[field] for u in usernames}
 
 
+def get_creater_username_and_picture(ids):
+    users = User.objects.filter(id__in=ids).values("id", "username", "")
+
+
 def get_albums_reviews_info(album_id):
     # 传入相册id，获取相册的回复信息
     replies = (

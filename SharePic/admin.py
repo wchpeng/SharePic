@@ -18,7 +18,7 @@ class MyselfInfoList(admin.ModelAdmin):
     # 抽象一个基类，用于创建的时候 creater_id 是当前用户id， 列表数据只显示当前用户创建的数据
 
     exclude = ["creater", "creater_id"]
-
+    list_display = ['id', '__str__']
     # def get_queryset(self, request):
     #     qs = super(MyselfInfoList, self).get_queryset(request)
     #     return qs.filter(creater_id=request.user.id)
