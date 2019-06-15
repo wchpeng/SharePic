@@ -9,7 +9,7 @@ from django.urls import reverse_lazy as reverse
 from django.http import JsonResponse, Http404
 
 from .models import Picture, Album, FavoriteAlbum, LikeAlbum
-from .utils import extend_albums_count, update_favorite_album_count, extend_album_info, update_like_album_count
+from .utils import extend_albums_count, update_favorite_album_count, extend_album_info, update_like_album_count, update_reply_album_count
 from .forms import AddReplyInfoFrom
 
 
@@ -60,7 +60,7 @@ class AlbumInfoView(LoginRequiredMixin, View):
 
         di = album_info.to_dict(("id", "title", "desc", "creater_id", "create_time"))
         extend_album_info(di, request.user.id)
-        # return JsonResponse(di)
+
         return render(request, 'picture/get_album_info.html', di)
 
     def put(self, request, album_id, *args, **kwargs):
@@ -96,8 +96,9 @@ class ReplyAddInfoView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = AddReplyInfoFrom(request.POST)
         if form.is_valid():
-            reply_id = form.save().id
-            return JsonResponse({"code": 0, "msg": "成功", "data": {"id": reply_id}})
+            obj = form.save()
+            update_reply_album_count(obj.album_id)
+            return JsonResponse({"code": 0, "msg": "成功", "data": {"id": obj.id}})
         return JsonResponse({"code": 400, "msg": "验证失败", "data": form.errors})
 
 
