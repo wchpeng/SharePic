@@ -73,8 +73,23 @@ class AlbumInfoView(LoginRequiredMixin, View):
 class AlbumAddInfoView(LoginRequiredMixin, View):
     login_url = reverse('user:user_login')
 
-    def post(self, request, album_id, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         return JsonResponse({"code": 0, "msg": "成功", "data": "暂未开发"})
+
+
+class PictureAddView(LoginRequiredMixin, View):
+    login_url = reverse('user:user_login')
+
+    def post(self, request, *args, **kwargs):
+        files = request.FILES.getlist("file")
+        pictures = []
+        for f in files:
+            print(type(f))
+            obj = Picture.objects.create(picture=f)
+            pictures.append({"id": obj.id, "picture_url": obj.picture.url})
+
+        return JsonResponse({"code": 0, "msg": "成功", "data": pictures})
+
 
 
 class ReplyInfoView(LoginRequiredMixin, View):

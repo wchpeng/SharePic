@@ -13,8 +13,8 @@ DEFAULT_USER_PICTURE = "/media/user/pictures/default.jpg"
 class Picture(models.Model):
     """一张张的图片"""
     picture = models.ImageField(verbose_name="图片")
-    desc = models.CharField(max_length=64, verbose_name="描述")
-    album_id = models.IntegerField(verbose_name="相册 id")
+    desc = models.CharField(max_length=64, default="", verbose_name="描述")
+    album_id = models.IntegerField(verbose_name="相册 id", default=0)
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
 
     def __str__(self):

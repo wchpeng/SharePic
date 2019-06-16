@@ -22,6 +22,7 @@
 			$.cookie("picture", "{{ request.user.picture.url }}");
 
 			$("#description").focus(function () {
+			    // 让 textarea 输入框的大小随内容而变化
 				$('textarea').each(function () {
 					this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
 				}).on('input', function () {
@@ -347,7 +348,6 @@
 				// 点击轮播图下的小图标，会加一个好看的边框
 				$(this).parent().siblings().css("border", "none");
 				$(this).parent().css("border", "4px solid #fa7d3d");
-
 			})
 
 		})
