@@ -67,7 +67,6 @@
 					cur.find("textarea").val("");
 					return false
 				}
-				console.log({csrfmiddlewaretoken:csrfmiddlewaretoken,album_id:album_id,parent_reply:parent_reply,content:content});
 
 				$.ajax({
                     url: "{% url 'picture:post_reply_info' %}",
@@ -108,7 +107,6 @@
 				var album_id = $(this).find($("input[name='album_id']")).val();
 				var parent_reply = $(this).find($("input[name='parent_reply']")).val();
 				var content = $(this).find($("textarea[name='content']")).val();
-				console.log({csrfmiddlewaretoken:csrfmiddlewaretoken,album_id:album_id,parent_reply:parent_reply,content:content});
 				$.ajax({
                     url: "{% url 'picture:post_reply_info' %}",
                     data: {csrfmiddlewaretoken:csrfmiddlewaretoken,album_id:album_id,parent_reply:parent_reply,content:content},
@@ -143,7 +141,6 @@
 				var album_id = $(this).find($("input[name='album_id']")).val();
 				var parent_reply = $(this).find($("input[name='parent_reply']")).val();
 				var content = $(this).parent().find($("textarea[name='content']")).val();
-				console.log({csrfmiddlewaretoken:csrfmiddlewaretoken,album_id:album_id,parent_reply:parent_reply,content:content});
 				$.ajax({
                     url: "{% url 'picture:post_reply_info' %}",
                     data: {csrfmiddlewaretoken:csrfmiddlewaretoken,album_id:album_id,parent_reply:parent_reply,content:content},
@@ -304,14 +301,20 @@
             }
 
 			function hide_horizontal_pic() {
-				// 切换轮播图和平铺图显示/隐藏
+				// 切换轮播图和平铺图显示/隐藏 轮播图显示，平铺图隐藏
 				$horizontal_pic.hide();
 				$carousel_pic.show();
+				change_div3_height_eq_width();
+				var slide_to_id = parseInt($(this).attr("id"));
+				$(".carousel").carousel(parseInt(slide_to_id))
+				$("img[data-slide-to='"+slide_to_id+"']").parent().css("border", "4px solid #fa7d3d");
 			}
 			function hide_carousel_pic() {
-				// 切换轮播图和平铺图显示/隐藏
+				// 切换轮播图和平铺图显示/隐藏 轮播图显示，平铺图隐藏
 				$horizontal_pic.show();
 				$carousel_pic.hide();
+				change_div3_height_eq_width();
+				$(".img-div").css("border", "none");
 			}
 			function set_textarea_cursor_last(cur){
 				// 设置 textarea 的游标为末尾
@@ -322,6 +325,31 @@
 				var len = tempStr2.length;
 				textObj.setSelectionRange(len, len);
 			}
+			function change_div3_height_eq_width(){
+				var glo_height = 0;
+                $(".img-cover").each(function(){
+                    wid = $(this).parent().css("width");
+                    <!--pad_left = $(this).parent().css("padding-left");-->
+                    <!--pad_right = $(this).parent().css("padding-right");-->
+                    if (Math.abs(parseInt(wid)-glo_height) > 1){
+                    	glo_height = parseInt(wid);
+                    }
+                    height = glo_height + "px";
+                    $(this).parent().css("height", height);
+                })
+            }
+            change_div3_height_eq_width();
+            $(window).resize(change_div3_height_eq_width);
+            $('.carousel').carousel({
+			  interval: false
+			})
+			$(".img-div img").click(function(){
+				// 点击轮播图下的小图标，会加一个好看的边框
+				$(this).parent().siblings().css("border", "none");
+				$(this).parent().css("border", "4px solid #fa7d3d");
+
+			})
+
 		})
 	</script>
 {% endblock script %}
@@ -329,17 +357,20 @@
 {% block style %}
 	<style>
 		body {
-			background-color: #d4d5df;
+			background-color: #b4daf1;
 		}
 
 		.container {
-			background-color: #a9afbd;
+			background-color: #93c5e4;
 		}
 
 		.one-album {
 			background-color: #ffffff;
 			padding-bottom: 15px;
 			padding-top: 10px;
+			<!--padding-left: 25px;-->
+			<!--padding-right: 25px;-->
+			<!--padding: 10px 25px 15px 25px;-->
 		}
 
 		.img-circle {
@@ -354,8 +385,8 @@
 		}
 
 		.rounded-image {
-			margin-right: -27px;
-			margin-top: 3px;
+			padding: 0px 0px 0px 0px;
+			margin: 3px 3px 0px 0px;;
 		}
 
 		.username {
@@ -373,17 +404,20 @@
 
 		.title-div {
 			padding-bottom: 7px;
-			padding-left: 4px;
+			padding-left: 0px;
 		}
 
 		.img-width100 {
 			width: 100%;
+			height: 100%;
+		}
+		.img-cover {
+			object-fit: cover;
 		}
 
 		.img-div {
-			margin-left: -15px;
-			margin-top: 3px;
-			margin-right: -12px;
+			padding: 1px 1px 1px 1px;
+			margin: 3px 3px 0 0;
 		}
 
 		.album-footer,
@@ -492,7 +526,7 @@
 
 		.qqFace {
 			margin-top: 4px;
-			background: #fff;
+			background: #ffffff;
 			padding: 2px;
 			border: 1px #dfe6f6 solid;
 		}
@@ -503,11 +537,46 @@
 
 		.qqFace table td img {
 			cursor: pointer;
-			border: 1px #fff solid;
+			border: 1px #ffffff solid;
 		}
 
 		.qqFace table td img:hover {
 			border: 1px #0066cc solid;
+		}
+		.col-xs-1-8,
+		.col-sm-1-8,
+		.col-md-1-8,
+		.col-lg-1-8 {
+			min-height: 1px;
+			<!--padding-left: 15px;-->
+			<!--padding-right: 15px;-->
+			position: relative;
+		}
+
+		.col-xs-1-8 {
+			width: 11.8%;
+			float: left;
+		}
+
+		@media (min-width: 768px) {
+			.col-sm-1-8 {
+				width: 11.8%;
+				float: left;
+			}
+		}
+
+		@media (min-width: 992px) {
+			.col-md-1-8 {
+				width: 11.8%;
+				float: left;
+			}
+		}
+
+		@media (min-width: 1200px) {
+			.col-lg-1-8 {
+				width: 11.8%;
+				float: left;
+			}
 		}
 	</style>
 {% endblock style %}
@@ -516,80 +585,71 @@
 	<div class="container">
 		<div class="row" style="padding-top: 25px;padding-bottom: 15px;">
 			<div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 one-album">
-
-				<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+				<!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">-->
+				<div class="col-xs-1-8" style="padding-right:10px;padding-left:5px;">
 					<img src="{{ creater__picture }}" alt="image" class="img-circle">
 				</div>
-				<div class="col-md-10 col-sm-10 col-xs-9 title-div">
-					<p class="username">{{ creater__username }}</p>
-					<p class="create_time">{{ create_time|datetime_semantization }}</p>
-					<div>
-						【{{ title|replace_em|safe }}】{{ desc|replace_em|safe }}
-					</div>
-				</div>
-				<div class="horizontal-pic">
+				<div class="col-sm-10 col-xs-10">
 					<div class="row">
-						<div class="col-xs-offset-2 col-sm-offset-2">
-						{% for picture in pictures|slice:":4" %}
-							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded-image">
-								<img src="{{ picture.picture }}" alt="image" class="img-width100">
+
+						<div class="col-xs-12 title-div">
+							<p class="username">{{ creater__username }}</p>
+							<p class="create_time">{{ create_time|datetime_semantization }}</p>
+							<div>
+								【{{ title|replace_em|safe }}】{{ desc|replace_em|safe }}
 							</div>
-						{% endfor %}
 						</div>
-					</div>
-					{% if pictures|length > 4 %}
-					<div class="row">
-						<div class="col-xs-offset-2 col-sm-offset-2">
-							{% for picture in pictures|slice:"4:" %}
-							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded-image">
-								<img src="{{ picture.picture }}" alt="image" class="img-width100">
+						<div class="horizontal-pic">
+
+							{% for picture in pictures %}
+							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded-image" id="{{ forloop.counter0 }}-horizontal-pic">
+								<img src="{{ picture.picture }}" alt="image" class="img-width100 img-cover">
 							</div>
 							{% endfor %}
-						</div>
-					</div>
-					{% endif %}
 
-				</div>
-				<div class="row carousel-pic" style="margin-top:10px;display:none;">
-					<div class="col-xs-offset-3 col-sm-offset-2">
-						<div class="col-xs-8">
-							<div class="close-carousel">
-								<a href="javascript:">
-									<span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span> 收起</a>
-							</div>
-							<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
-								<!-- Wrapper for slides -->
-								<div class="carousel-inner" role="listbox">
-									{% for p in pictures %}
-									<div class="item {% if forloop.counter0 == 0 %}active{% endif %}">
-										<img src="{{ p.picture }}" alt="..." class="img-width100">
-										<!--<div class="carousel-caption">-->
-											<!--this 111-->
-										<!--</div>-->
+						</div>
+
+						<div class="row carousel-pic" style="margin-top:10px;display:none;">
+							<div class="col-xs-12">
+								<div class="close-carousel">
+									<a href="javascript:">
+										<span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span> 收起</a>
+								</div>
+								<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+									<!-- Wrapper for slides -->
+									<div class="carousel-inner" role="listbox">
+										{% for p in pictures %}
+										<div class="item {% if forloop.counter0 == 0 %}active{% endif %}">
+											<img src="{{ p.picture }}" alt="..." class="img-width100">
+											<!--<div class="carousel-caption">-->
+												<!--this 111-->
+											<!--</div>-->
+										</div>
+										{% endfor %}
 									</div>
-									{% endfor %}
+
+									<!-- Controls -->
+									<a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+										<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+										<span class="sr-only">Previous</span>
+									</a>
+									<a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+										<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+										<span class="sr-only">Next</span>
+									</a>
+									<div style="margin-top:10px;">
+										{% for p in pictures %}
+										<!--<div class="col-sm-2 col-xs-3 img-div" style="width:17%">-->
+										<div class="col-xs-1-8 img-div">
+											<img src="{{ p.picture }}" alt="" class="img-width100 img-cover" data-target="#carousel-example-generic" data-slide-to="{{ forloop.counter0 }}">
+										</div>
+										{% endfor %}
+									</div>
 								</div>
-
-								<!-- Controls -->
-								<a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
-									<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-									<span class="sr-only">Previous</span>
-								</a>
-								<a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
-									<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-									<span class="sr-only">Next</span>
-								</a>
-
-								{% for p in pictures %}
-								<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 img-div">
-									<img src="{{ p.picture }}" alt="" class="img-width100" data-target="#carousel-example-generic" data-slide-to="{{ forloop.counter0 }}">
-								</div>
-								{% endfor %}
-
 							</div>
+
 						</div>
 					</div>
-
 				</div>
 
 			</div>
