@@ -561,7 +561,7 @@
 								<!-- Wrapper for slides -->
 								<div class="carousel-inner" role="listbox">
 									{% for p in pictures %}
-									<div class="item active">
+									<div class="item {% if forloop.counter0 == 0 %}active{% endif %}">
 										<img src="{{ p.picture }}" alt="..." class="img-width100">
 										<!--<div class="carousel-caption">-->
 											<!--this 111-->
@@ -582,7 +582,7 @@
 
 								{% for p in pictures %}
 								<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 img-div">
-									<img src="{{ p.picture }}" alt="" class="img-width100" data-target="#carousel-example-generic" data-slide-to="0">
+									<img src="{{ p.picture }}" alt="" class="img-width100" data-target="#carousel-example-generic" data-slide-to="{{ forloop.counter0 }}">
 								</div>
 								{% endfor %}
 
