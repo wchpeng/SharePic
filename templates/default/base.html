@@ -24,6 +24,7 @@
                 <!--window.location.href = "http://baidu.com/s" + "?wd=" + $q.val();-->
                 return false
             });
+
             $("#inputDesc3").focus(function () {
                 // 让 textarea 输入框的大小随内容而变化
                 $('textarea').each(function () {
@@ -33,6 +34,7 @@
                     this.style.height = (this.scrollHeight) + 'px';
                 });
             });
+
             $("#inputImage3").change(function(){
                 var $picture_form = $("#post-picture");
                 var formData = new FormData($picture_form[0]);
@@ -63,7 +65,8 @@
                         console.log("------------");
                     }
                 })
-            })
+            });
+
             function change_div3_height_eq_width(cls_name) {
                 var glo_height = 0;
                 $("." + cls_name).each(function () {
@@ -75,20 +78,19 @@
                     $(this).parent().css("height", height);
                 })
             }
+
             change_div3_height_eq_width("img-cover");
             $("#post-pic-id").on("click", ".delete", function(){
                 $(this).parent().remove();
-            })
+            });
         })
     </script>
     <style>
         .posted-picture {
             width: 100px;
-            /* width: 100%; */
             height: 100%;
-            padding: 15px 15px 0px 0px;
-
             position: relative;
+            padding: 8px;
         }
 
         .delete {
@@ -189,7 +191,7 @@
                                         <input type="file" class="form-control" id="inputImage3" name="file"
                                             accept="image/gif,image/jpg,image/jpeg,image/png" multiple>
                                     </div>
-                                    <div class="col-sm-8 col-sm-offset-2">
+                                    <div class="col-sm-8">
                                         <p class="help-block">(最多8张)</p>
                                         <div id="post-pic-id">
 

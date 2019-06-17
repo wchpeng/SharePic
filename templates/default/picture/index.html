@@ -40,9 +40,6 @@
 
 {% block style %}
     <style>
-        [class*="col-"] {
-            padding: 8px;
-        }
         .heart {
             font-size: 16px;
         }
@@ -70,7 +67,7 @@
         <div class="row">
 
             {% for value in values %}
-            <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+            <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12" style="padding-left:8px;padding-right:8px;padding-top:8px;padding-bottom:8px">
                 <div class="thumbnail">
                     <a href="{% url 'picture:album_info' value.id %}"><img src="{{ value.first_picture }}" alt="..."></a>
                     <div class="caption">
