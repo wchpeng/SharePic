@@ -116,6 +116,7 @@
                             console.log(data)
                             $("#myModal").modal("hide");
                             show_loadingWrapper("添加成功！");
+                            clear_post_album_info();
                         } else {
                             console.log("fail");
                             console.log(data);
@@ -146,6 +147,14 @@
                 setTimeout(function(){
                     add_error_tips("")
                 }, 4000)
+            }
+            function clear_post_album_info(){
+                <!--console.log($("#myModal").find("input"));-->
+                <!--$("#myModal").find("input").val("");-->
+                $("#inputTitle3").val("");
+                $("#inputDesc3").val("");
+                $("#inputImage3").val("");
+                $("#post-pic-id").children().remove();
             }
         })
     </script>
