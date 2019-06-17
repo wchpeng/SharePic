@@ -33,7 +33,24 @@
                     $heart_n_span.html(heart_count + 1);
                     $current.css("color", "rgb(232, 94, 146)");
                 }
+            };
+
+            function change_div3_height_eq_width(){
+				var glo_height = 0;
+                $(".img-cover").each(function(){
+                    wid = $(this).css("width");
+                    <!--pad_left = $(this).parent().css("padding-left");-->
+                    <!--pad_right = $(this).parent().css("padding-right");-->
+                    if (Math.abs(parseInt(wid)-glo_height) > 1){
+                    	glo_height = parseInt(wid);
+                    }
+                    height = glo_height + "px";
+
+                    $(this).css("height", height);
+                })
             }
+            change_div3_height_eq_width();
+            $(window).resize(change_div3_height_eq_width);
         })
     </script>
 {% endblock %}
@@ -49,6 +66,10 @@
         }
         .heart_span {
             font-size: 16px;
+        }
+        .img-cover {
+            width:100%;
+            object-fit: cover;
         }
 
         a:link{text-decoration:none;   /* 指正常的未被访问过的链接*/}
@@ -69,7 +90,7 @@
             {% for value in values %}
             <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12" style="padding-left:8px;padding-right:8px;padding-top:8px;padding-bottom:8px">
                 <div class="thumbnail">
-                    <a href="{% url 'picture:album_info' value.id %}"><img src="{{ value.first_picture }}" alt="..."></a>
+                    <a href="{% url 'picture:album_info' value.id %}"><img class="img-cover" src="{{ value.first_picture }}" alt="..."></a>
                     <div class="caption">
                         <!--<a href="http://baidu.com/s?wd=穷怎么办" class="text-danger" style="font-size:16px;">校花图</a>-->
                         <a href="{% url 'user:user_info' value.creater_id %}" class="text-danger">{{ value.user__username }}</a>

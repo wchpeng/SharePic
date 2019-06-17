@@ -36,15 +36,8 @@
             });
 
             $("#inputImage3").change(function(){
-                var $picture_form = $("#post-picture");
-                var formData = new FormData($picture_form[0]);
-                files = $(this)[0].files;
-                console.log("files: ")
-                console.log(files)
-                <!--formData.append('file', files);-->
-                <!--formData.append('csrfmiddlewaretoken', $("#post-picture").children("input[name='csrfmiddlewaretoken']").val());-->
-                console.log("formData: ")
-                console.log(formData);
+                var formData = new FormData($("#post-picture")[0]);
+
                 $.ajax({
                     url: "{% url 'picture:post_picture_info' %}",
                     type: "POST",
@@ -53,19 +46,27 @@
                     processData: false,
                     contentType: false,
                     success: function(data){
-                        console.log("------------");
-                        console.log("success: ");
-                        console.log(data);
-                        console.log("------------");
+                        for (var i = 0; i<data.data.length; i++) {
+                            var pic_id = data.data[i].id;
+                            var pic_url = data.data[i].picture_url;
+                            add_posted_picture_div(pic_id, pic_url)
+                        }
+                        change_div3_height_eq_width("img-cover");
                     },
                     fail: function(data){
-                        console.log("------------");
                         console.log("fail: ");
                         console.log(data);
-                        console.log("------------");
                     }
                 })
             });
+
+            function add_posted_picture_div(pic_id, pic_url){
+                s = '<div class="col-xs-4 col-sm-3 posted-picture" id="' + pic_id + '-posted-picture">\
+                        <img src="' + pic_url + '" alt="" class="img-cover">\
+                        <div class="delete"><a href="javascript:"><img src="{% static 'base/bg_groups/delete_1.png' %}" alt=""></a></div>\
+                    </div>'
+                $("#post-pic-id").append(s)
+            }
 
             function change_div3_height_eq_width(cls_name) {
                 var glo_height = 0;
@@ -83,9 +84,83 @@
             $("#post-pic-id").on("click", ".delete", function(){
                 $(this).parent().remove();
             });
+            $("#publish-album").click(function(){
+                console.log($("#post-pic-id").find(".posted-picture").length);
+                console.log("inputDesc3 val(): ")
+                console.log($("#inputDesc3").val());
+
+                if ($("#post-pic-id").find(".posted-picture").length > 8){
+                    add_error_tips("图片太多！")
+                    return
+                }
+                if ($("#post-pic-id").find(".posted-picture").length == 0){
+                    add_error_tips("缺少图片！")
+                    return
+                }
+                if (!$("#inputDesc3").val()) {
+                    add_error_tips("必须输入内容！")
+                    return
+                }
+
+                var pic_ids = get_picture_ids();
+                var data = {
+                    title: $("#inputTitle3").val(), desc: $("#inputDesc3").val(),
+                    picture_ids: pic_ids, csrfmiddlewaretoken: $("#post-album").children("input[name='csrfmiddlewaretoken']").val()
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'picture:post_album_info' %}",
+                    data: data,
+                    success: function(data){
+                        if (data.code == 0) {
+                            console.log(data)
+                            $("#myModal").modal("hide");
+                            show_loadingWrapper("添加成功！");
+                        } else {
+                            console.log("fail");
+                            console.log(data);
+                        }
+                    }
+                })
+            });
+            function get_picture_ids(){
+                var picture_ids = new Array();
+                var i = 0;
+                $("#post-pic-id").find(".posted-picture").each(function(){
+                    picture_ids[i] = parseInt($(this).attr("id"));
+                    i += 1;
+                })
+                return picture_ids.toString()
+            }
+            function show_loadingWrapper(s){
+                $("body").prepend('<div class="loadingWrapper">\
+                    <img src="{% static 'base/bg_groups/success_1.png' %}" alt="" style="height: 50px; width: 50px;float:left">\
+                    <p style="padding-left:10px;margin:0px;height:50px;line-height: 50px;font-size: 40px;float:left;font-family:\'SimHei\';color:green;">' + s + '</p>\
+                </div>')
+                setTimeout(function(){
+                    $(".loadingWrapper").remove()
+                }, 1000);
+            }
+            function add_error_tips(s){
+                $("#tips-errors").html(s)
+                setTimeout(function(){
+                    add_error_tips("")
+                }, 4000)
+            }
         })
     </script>
     <style>
+        .loadingWrapper {
+            position: fixed;
+            margin-left: -100px;
+            height: 90px;
+            left: 50%;
+            top: 20%;
+            z-index: 1;
+            background-color: coral;
+            padding: 20px;
+            border-radius: 8px;
+        }
         .posted-picture {
             width: 100px;
             height: 100%;
@@ -179,6 +254,7 @@
                                     <div class="col-sm-8">
                                         <!-- <input type="text" class="form-control" name="desc" id="inputDesc3" placeholder="说点什么吧"> -->
                                         <textarea class="form-control" name="desc" id="inputDesc3" placeholder="说点什么吧" rows="3"></textarea>
+                                        <input type="hidden" id="id-posted-picture-ids" name="picture_ids">
                                     </div>
                                 </div>
                             </form>
@@ -192,28 +268,28 @@
                                             accept="image/gif,image/jpg,image/jpeg,image/png" multiple>
                                     </div>
                                     <div class="col-sm-8">
-                                        <p class="help-block">(最多8张)</p>
+                                        <p class="help-block">(最多8张)<span id="tips-errors" style="padding-left:20px;font-weight:bold;color:red"></span> </p>
                                         <div id="post-pic-id">
 
-                                            <div class="col-xs-4 col-sm-3 posted-picture">
+                                            <div class="col-xs-4 col-sm-3 posted-picture" id="1-posted-picture">
                                                 <img src="{% static 'base/bg_groups/1.jpg' %}" alt="" class="img-cover">
                                                 <div class="delete"><a href="javascript:"><img src="{% static 'base/bg_groups/delete_1.png' %}" alt=""></a></div>
                                             </div>
 
-                                            <div class="col-xs-4 col-sm-3 posted-picture">
+                                            <div class="col-xs-4 col-sm-3 posted-picture" id="2-posted-picture">
                                                 <img src="{% static 'base/bg_groups/9.jpg' %}" alt="" class="img-cover">
                                                 <div class="delete"><a href="javascript:"><img src="{% static 'base/bg_groups/delete_1.png' %}" alt=""></a></div>
                                             </div>
 
-                                            <div class="col-xs-4 col-sm-3 posted-picture">
+                                            <div class="col-xs-4 col-sm-3 posted-picture" id="3-posted-picture">
                                                 <img src="{% static 'base/bg_groups/6.jpg' %}" alt="" class="img-cover">
                                                 <div class="delete"><a href="javascript:"><img src="{% static 'base/bg_groups/delete_1.png' %}" alt=""></a></div>
                                             </div>
-                                            <div class="col-xs-4 col-sm-3 posted-picture">
+                                            <div class="col-xs-4 col-sm-3 posted-picture" id="4-posted-picture">
                                                 <img src="{% static 'base/bg_groups/7.jpg' %}" alt="" class="img-cover">
                                                 <div class="delete"><a href="javascript:"><img src="{% static 'base/bg_groups/delete_1.png' %}" alt=""></a></div>
                                             </div>
-                                            <div class="col-xs-4 col-sm-3 posted-picture">
+                                            <div class="col-xs-4 col-sm-3 posted-picture" id="5-posted-picture">
                                                 <img src="{% static 'base/bg_groups/8.jpeg' %}" alt="" class="img-cover">
                                                 <div class="delete"><a href="javascript:"><img src="{% static 'base/bg_groups/delete_1.png' %}" alt=""></a></div>
                                             </div>

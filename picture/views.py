@@ -74,7 +74,22 @@ class AlbumAddInfoView(LoginRequiredMixin, View):
     login_url = reverse('user:user_login')
 
     def post(self, request, *args, **kwargs):
-        return JsonResponse({"code": 0, "msg": "成功", "data": "暂未开发"})
+        print(request.POST)
+        title = request.POST.get("title", "")
+        desc = request.POST.get("desc", "")
+        picture_ids = request.POST.get("picture_ids", "")
+        if not desc:
+            return JsonResponse({"code": 101, "msg": "缺少 desc", "data": {"id": -1}})
+        if not picture_ids:
+            return JsonResponse({"code": 101, "msg": "缺少 pictures", "data": {"id": -1}})
+
+        picture_ids = picture_ids.split(",")
+        obj = Album.objects.create(
+            title=title, desc=desc, first_picture_id=picture_ids[0], creater_id=request.user.id
+        )
+        Picture.objects.filter(id__in=picture_ids).update(album_id=obj.id)
+
+        return JsonResponse({"code": 0, "msg": "成功", "data": {"id": obj.id}})
 
 
 class PictureAddView(LoginRequiredMixin, View):
@@ -84,12 +99,10 @@ class PictureAddView(LoginRequiredMixin, View):
         files = request.FILES.getlist("file")
         pictures = []
         for f in files:
-            print(type(f))
             obj = Picture.objects.create(picture=f)
             pictures.append({"id": obj.id, "picture_url": obj.picture.url})
 
         return JsonResponse({"code": 0, "msg": "成功", "data": pictures})
-
 
 
 class ReplyInfoView(LoginRequiredMixin, View):
