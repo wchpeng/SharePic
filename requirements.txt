@@ -11,7 +11,7 @@ eventlet==0.24.1
 greenlet==0.4.15
 kombu==4.5.0
 Markdown==3.1.1
-mistune==0.8.4
+mistune==2.0.3
 monotonic==1.5
 Pillow==6.0.0
 Pygments==2.4.0
